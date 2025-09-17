@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reading - Gleaned</title>
+    <meta name="description" content="RSVP Speed Reading Interface">
+
+    <!-- PWA Meta -->
+    <meta name="theme-color" content="#007bff">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/src/styles/reading.css">
+</head>
+
+<body>
+    <header class="reading-header">
+        <button class="back-button" onclick="window.location.href='index.html'" aria-label="Back">
+            <i data-lucide="chevron-left"></i>
+        </button>
+        <div class="reading-info">
+            <span id="article-title">Loading...</span>
+        </div>
+    </header>
+
+    <main class="reading-container">
+        <!-- RSVP Display Area -->
+        <section id="rsvp-section" class="rsvp-section">
+            <div id="rsvp-display"></div>
+        </section>
+
+        <!-- Progress Tracking (moved above controls) -->
+        <section id="progress-section" class="progress-section">
+            <div id="progress-display"></div>
+        </section>
+
+        <!-- Reading Controls -->
+        <section id="controls-section" class="controls-section">
+            <div id="reading-controls"></div>
+        </section>
+    </main>
+
+    <!-- Lucide Icons (CDN) -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script type="module" src="/src/reading.ts"></script>
+</body>
+
+</html>

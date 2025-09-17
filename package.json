@@ -1,0 +1,38 @@
+{
+  "name": "gleaned",
+  "version": "1.0.0",
+  "description": "A PWA for clean, speed-reading of web content",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:bdd": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm node_modules/@cucumber/cucumber/bin/cucumber-js --import features/step_definitions/**/*.ts",
+    "test:bdd:dry": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm node_modules/@cucumber/cucumber/bin/cucumber-js --import features/step_definitions/**/*.ts --dry-run",
+    "e2e": "playwright test",
+    "lint": "eslint src --ext ts,js,tsx,jsx --report-unused-disable-directives --max-warnings 0",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^12.2.0",
+    "@cucumber/pretty-formatter": "^2.1.0",
+    "@types/node": "^20.8.0",
+    "@typescript-eslint/eslint-plugin": "^6.7.4",
+    "@typescript-eslint/parser": "^6.7.4",
+    "@vitest/ui": "^0.34.6",
+    "eslint": "^8.50.0",
+    "jsdom": "^22.1.0",
+    "playwright": "^1.39.0",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.2.2",
+    "vite": "^4.4.11",
+    "vitest": "^0.34.6"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0"
+  }
+}
