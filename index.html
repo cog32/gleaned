@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gleaned - Clean Reading Experience</title>
+    <meta name="description" content="Clean up web articles for distraction-free speed reading">
+
+    <!-- PWA Meta -->
+    <meta name="theme-color" content="#007bff">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="header-left">
+            <button class="back-button">📄</button>
+        </div>
+        <div class="header-right">
+            <button id="play-button" class="play-button" disabled>▷</button>
+            <button class="menu-button">≡≡≡</button>
+            <button class="more-button">•••</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="url-input-section"></div>
+        <div id="content-section"></div>
+
+        <!-- Service Worker Status -->
+        <div id="sw-status"
+            style="margin-bottom: 1rem; padding: 0.5rem; background: #f0f0f0; border-radius: 4px; font-size: 0.9rem;">
+            <strong>Service Worker:</strong> <span id="sw-status-text">Checking...</span>
+        </div>
+
+        <!-- Bookmarklet Section -->
+        <div id="bookmarklet-section" class="bookmarklet-section" style="display: none;">
+            <h2>📖 Read Any Article with Gleaned</h2>
+            <p>Drag this bookmarklet to your bookmarks bar, then click it on any article to start speed reading:</p>
+
+            <div class="bookmarklet-container">
+                <a id="bookmarklet-link" href="javascript:void(0)"
+                    class="bookmarklet-link" onclick="return false;">
+                    📖 Gleaned
+                </a>
+            </div>
+
+            <div class="bookmarklet-help">
+                <h3>How to use:</h3>
+                <ol>
+                    <li>Drag the "📖 Gleaned" button above to your bookmarks bar</li>
+                    <li>Navigate to any article on the web</li>
+                    <li>Click the bookmarklet in your bookmarks bar</li>
+                    <li>The article will be extracted and opened in Gleaned</li>
+                </ol>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
