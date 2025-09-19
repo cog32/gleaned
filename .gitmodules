@@ -1,0 +1,3 @@
+[submodule "covid-n"]
+	path = covid-n
+	url = https://github.com/cog32/covid-n.git
