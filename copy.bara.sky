@@ -32,11 +32,8 @@ public_to_private = core.workflow(
     ]),
     authoring = authoring.overwrite("Copybara <noreply@copybara.com>"),
     transformations = [
-        # Only sync features directory if it exists in public repo
-        core.move("", ""),
-        metadata.replace_text(
-            "Copybara import from public gleaned repo",
-            "🔄 Synced from public gleaned repo\n\nCo-authored-by: Copybara <noreply@copybara.com>",
+        metadata.squash_notes(
+            prefix = "🔄 Synced from public gleaned repo\n\n",
         ),
     ],
 )
@@ -64,9 +61,8 @@ private_to_public = core.workflow(
     ]),
     authoring = authoring.overwrite("Copybara <noreply@copybara.com>"),
     transformations = [
-        metadata.replace_text(
-            "Copybara export to public gleaned repo",
-            "🔄 Synced to public gleaned repo\n\nCo-authored-by: Copybara <noreply@copybara.com>",
+        metadata.squash_notes(
+            prefix = "🔄 Synced to public gleaned repo\n\n",
         ),
     ],
 )

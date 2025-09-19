@@ -6,13 +6,13 @@
 # Sync from public gleaned TO private gleaned-covid
 sync_from_public() {
     echo "Syncing from public gleaned repo to private gleaned-covid..."
-    copybara copy.bara.sky public_to_private --force
+    ./copybara copy.bara.sky public_to_private --force
 }
 
 # Sync from private gleaned-covid TO public gleaned
 sync_to_public() {
     echo "Syncing from private gleaned-covid to public gleaned repo..."
-    copybara copy.bara.sky private_to_public --force
+    ./copybara copy.bara.sky private_to_public --force
 }
 
 # Show help
