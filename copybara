@@ -1,0 +1,3 @@
+#!/bin/bash
+export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"
+exec java -jar /Users/richard/Downloads/copybara_deploy.jar "$@"
