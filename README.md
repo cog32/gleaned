@@ -1,6 +1,14 @@
 # Readme
 
-Spec is at [SPEC](./SPEC.md)
+## Go to
+
+This is an open source, local first progressive web app for speed reading.  This just means instead of having an app, you just visit a webpage and it will cache some information inside your browser so you can reuse it easily.
+
+[Gleaned](https://url)  please try it out and if you like it, buy me a coffee.
+
+# TODO  add the buy me a coffee link from stripe
+
+# TODO The usage should be self explanatory
 
 ## Reading Page Modes
 
@@ -14,6 +22,8 @@ To enable Debug mode, append `?debug=1` to the reading page URL:
 - Example: `http://localhost:3000/reading.html?debug=1`
 
 This does not change any data; it only exposes additional controls and visuals that are hidden in the default minimal experience.
+
+# TODO the readability should be delivered by the site and not require extra steps
 
 ## Offline Readability
 
