@@ -53,8 +53,17 @@ private_to_public = core.workflow(
         # Never sync private-only directories
         ".covid/**",
         ".git/**",
-        # Don't sync copybara config
+        # Don't sync copybara config and setup files
         "copy.bara.sky",
+        "sync-scripts.sh",
+        "setup-private-repo.sh",
+        "copybara",
+        "template.json",
+        "template-setup.md",
+        # One-way sync: git config files only go public→private, not private→public
+        ".gitattributes",
+        ".gitignore",
+        ".gitmodules",
     ]),
     destination_files = glob(["**"], exclude = [
         ".git/**",
