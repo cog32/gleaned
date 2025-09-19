@@ -1,0 +1,46 @@
+commit 91719e8861fb0d1fd94b74c72a9171738dd73f61
+Author: cog32 <cog32apps@gmail.com>
+Date:   Fri Sep 19 12:06:32 2025 +1000
+
+    Install and configure Copybara for repository syncing
+    
+    - Added local copybara wrapper script with Java 21
+    - Fixed Copybara configuration transformations
+    - Updated sync scripts to use local copybara wrapper
+    - Successfully synced changes to public gleaned repository
+    
+    🤖 Generated with [Claude Code](https://claude.ai/code)
+    
+    Co-Authored-By: Claude <noreply@anthropic.com>
+
+diff --git a/copy.bara.sky b/copy.bara.sky
+index 3c53a3f..984ed81 100644
+--- a/copy.bara.sky
++++ b/copy.bara.sky
+@@ -32,11 +32,8 @@ public_to_private = core.workflow(
+     ]),
+     authoring = authoring.overwrite("Copybara <noreply@copybara.com>"),
+     transformations = [
+-        # Only sync features directory if it exists in public repo
+-        core.move("", ""),
+-        metadata.replace_text(
+-            "Copybara import from public gleaned repo",
+-            "🔄 Synced from public gleaned repo\n\nCo-authored-by: Copybara <noreply@copybara.com>",
++        metadata.squash_notes(
++            prefix = "🔄 Synced from public gleaned repo\n\n",
+         ),
+     ],
+ )
+@@ -64,9 +61,8 @@ private_to_public = core.workflow(
+     ]),
+     authoring = authoring.overwrite("Copybara <noreply@copybara.com>"),
+     transformations = [
+-        metadata.replace_text(
+-            "Copybara export to public gleaned repo",
+-            "🔄 Synced to public gleaned repo\n\nCo-authored-by: Copybara <noreply@copybara.com>",
++        metadata.squash_notes(
++            prefix = "🔄 Synced to public gleaned repo\n\n",
+         ),
+     ],
+ )
+\ No newline at end of file
