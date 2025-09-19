@@ -1,25 +1,3 @@
-commit 91719e8861fb0d1fd94b74c72a9171738dd73f61
-Author: cog32 <cog32apps@gmail.com>
-Date:   Fri Sep 19 12:06:32 2025 +1000
-
-    Install and configure Copybara for repository syncing
-    
-    - Added local copybara wrapper script with Java 21
-    - Fixed Copybara configuration transformations
-    - Updated sync scripts to use local copybara wrapper
-    - Successfully synced changes to public gleaned repository
-    
-    🤖 Generated with [Claude Code](https://claude.ai/code)
-    
-    Co-Authored-By: Claude <noreply@anthropic.com>
-
-diff --git a/copybara b/copybara
-new file mode 100755
-index 0000000..19b9cbc
---- /dev/null
-+++ b/copybara
-@@ -0,0 +1,3 @@
-+#!/bin/bash
-+export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"
-+exec java -jar /Users/richard/Downloads/copybara_deploy.jar "$@"
-\ No newline at end of file
+#!/bin/bash
+export PATH="/opt/homebrew/opt/openjdk@21/bin:$PATH"
+exec java -jar /Users/richard/Downloads/copybara_deploy.jar "$@"

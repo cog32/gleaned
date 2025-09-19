@@ -1,35 +1,49 @@
-commit 91719e8861fb0d1fd94b74c72a9171738dd73f61
-Author: cog32 <cog32apps@gmail.com>
-Date:   Fri Sep 19 12:06:32 2025 +1000
+#!/bin/bash
 
-    Install and configure Copybara for repository syncing
-    
-    - Added local copybara wrapper script with Java 21
-    - Fixed Copybara configuration transformations
-    - Updated sync scripts to use local copybara wrapper
-    - Successfully synced changes to public gleaned repository
-    
-    🤖 Generated with [Claude Code](https://claude.ai/code)
-    
-    Co-Authored-By: Claude <noreply@anthropic.com>
+# Copybara sync scripts for gleaned-covid repository
+# Make sure you have Copybara installed: https://github.com/google/copybara
 
-diff --git a/sync-scripts.sh b/sync-scripts.sh
-index f0404e8..8e6e209 100755
---- a/sync-scripts.sh
-+++ b/sync-scripts.sh
-@@ -6,13 +6,13 @@
- # Sync from public gleaned TO private gleaned-covid
- sync_from_public() {
-     echo "Syncing from public gleaned repo to private gleaned-covid..."
--    copybara copy.bara.sky public_to_private --force
-+    ./copybara copy.bara.sky public_to_private --force
- }
- 
- # Sync from private gleaned-covid TO public gleaned
- sync_to_public() {
-     echo "Syncing from private gleaned-covid to public gleaned repo..."
--    copybara copy.bara.sky private_to_public --force
-+    ./copybara copy.bara.sky private_to_public --force
- }
- 
- # Show help
+# Sync from public gleaned TO private gleaned-covid
+sync_from_public() {
+    echo "Syncing from public gleaned repo to private gleaned-covid..."
+    ./copybara copy.bara.sky public_to_private --force
+}
+
+# Sync from private gleaned-covid TO public gleaned
+sync_to_public() {
+    echo "Syncing from private gleaned-covid to public gleaned repo..."
+    ./copybara copy.bara.sky private_to_public --force
+}
+
+# Show help
+show_help() {
+    echo "Usage: $0 [COMMAND]"
+    echo ""
+    echo "Commands:"
+    echo "  from-public    Sync changes from public gleaned repo"
+    echo "  to-public      Sync changes to public gleaned repo"
+    echo "  help           Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  $0 from-public   # Pull latest changes from public repo"
+    echo "  $0 to-public     # Push your changes to public repo"
+}
+
+# Main script logic
+case "$1" in
+    "from-public")
+        sync_from_public
+        ;;
+    "to-public")
+        sync_to_public
+        ;;
+    "help"|"--help"|"-h")
+        show_help
+        ;;
+    *)
+        echo "Error: Unknown command '$1'"
+        echo ""
+        show_help
+        exit 1
+        ;;
+esac
