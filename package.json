@@ -1,7 +1,7 @@
 {
   "name": "gleaned",
   "version": "1.0.0",
-  "description": "A PWA for clean, speed-reading of web content",
+  "description": "A PWA for clean, speed-reading of web content with COVID multi-agent integration",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,10 @@
     "test:bdd:dry": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm node_modules/@cucumber/cucumber/bin/cucumber-js --import features/step_definitions/**/*.ts --dry-run",
     "e2e": "playwright test",
     "lint": "eslint src --ext ts,js,tsx,jsx --report-unused-disable-directives --max-warnings 0",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "next-issue": "cd .covid/core && source .venv/bin/activate && cd ../../ && python scripts/execute_paid_issue.py --next",
+    "list-paid": "python scripts/execute_paid_issue.py --list",
+    "execute-issue": "python scripts/execute_paid_issue.py --issue"
   },
   "devDependencies": {
     "@cucumber/cucumber": "^12.2.0",
