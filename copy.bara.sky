@@ -25,8 +25,8 @@ public_to_private = core.workflow(
         # Any other files we don't want to sync
     ]),
     destination_files = glob(["**"], exclude = [
-        # Never overwrite the covid-n directory
-        "covid-n/**",
+        # Never overwrite the .covid directory
+        ".covid/**",
         # Keep any private-only features if they don't exist in public
         "features/**",
     ]),
@@ -54,7 +54,7 @@ private_to_public = core.workflow(
     ),
     origin_files = glob(["**"], exclude = [
         # Never sync private-only directories
-        "covid-n/**",
+        ".covid/**",
         ".git/**",
         # Don't sync copybara config
         "copy.bara.sky",
