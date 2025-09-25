@@ -102,7 +102,7 @@ self.addEventListener('fetch', (event) => {
         }
 
         // Fetch from network
-        return fetch(event.request)
+        return fetch(event.request, { redirect: 'follow' })
           .then((response) => {
             // Don't cache non-successful responses or non-http schemes
             if (!response || response.status !== 200 || response.type !== 'basic') {
@@ -214,7 +214,7 @@ async function handleIngestRedirect(request) {
     const cached = await caches.match('/ingest.html')
     if (cached) return cached
     // Fallback to network fetch
-    return fetch('/ingest.html')
+    return fetch('/ingest.html', { redirect: 'follow' })
   } catch (error) {
     console.error('Service Worker: Ingest route failed', error)
     // Final fallback: index
