@@ -39,13 +39,13 @@ You can also run the script directly:
 
 ```bash
 # Execute next available issue
-python scripts/execute_paid_issue.py --next
+python3 scripts/execute_paid_issue.py --next
 
 # List all paid issues
-python scripts/execute_paid_issue.py --list
+python3 scripts/execute_paid_issue.py --list
 
 # Execute specific issue
-python scripts/execute_paid_issue.py --issue 123
+python3 scripts/execute_paid_issue.py --issue 123
 ```
 
 ## Workflow

@@ -1,34 +1,46 @@
 // Gleaned Service Worker
-const CACHE_NAME = 'gleaned-v1'
-const STATIC_CACHE = 'gleaned-static-v1'
+const CACHE_NAME = 'gleaned-v2'
+const STATIC_CACHE = 'gleaned-static-v2'
 const IS_DEV = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1'
 
-// Files to cache on install
+// Files to cache on install (minimal; HTML is cached on first visit at runtime)
 const STATIC_FILES = [
-  '/',
-  '/index.html',
-  '/reading.html',
-  '/ingest.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/favicon.ico',
+  '/static/extractor.bundle.js',
+  '/vendor/Readability.js'
 ]
 
 // Install event - cache static files
 self.addEventListener('install', (event) => {
   console.log('🔧 Service Worker: Installing...')
-  event.waitUntil(
-    caches.open(STATIC_CACHE)
-      .then((cache) => {
-        console.log('📦 Service Worker: Caching static files')
-        return cache.addAll(STATIC_FILES)
-      })
-      .then(() => {
-        console.log('✅ Service Worker: Installed successfully')
-        return self.skipWaiting() // Force immediate activation
-      })
-      .catch((error) => {
-        console.error('❌ Service Worker: Installation failed', error)
-      })
-  )
+  event.waitUntil((async () => {
+    try {
+      const cache = await caches.open(STATIC_CACHE)
+      console.log('📦 Service Worker: Caching static files (best-effort)')
+      await Promise.all(
+        STATIC_FILES.map(async (path) => {
+          try {
+            const req = new Request(path, { cache: 'reload' })
+            const resp = await fetch(req)
+            if (resp && resp.ok) {
+              await cache.put(req, resp.clone())
+            } else if (IS_DEV) {
+              console.log('Service Worker: Skipped pre-cache (not OK)', path, resp?.status)
+            }
+          } catch (e) {
+            if (IS_DEV) {
+              console.log('Service Worker: Failed to pre-cache', path)
+            }
+          }
+        })
+      )
+      console.log('✅ Service Worker: Installed successfully')
+      await self.skipWaiting() // Force immediate activation
+    } catch (error) {
+      console.error('❌ Service Worker: Installation failed', error)
+    }
+  })())
 })
 
 // Activate event - clean up old caches
@@ -80,9 +92,9 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Handle the /ingest endpoint
-  if (url.pathname === '/ingest') {
-    event.respondWith(handleIngestRedirect(event.request))
+  // For navigation requests, let the browser handle them directly to avoid
+  // returning redirected responses (e.g. pretty-URL rewrites).
+  if (event.request.mode === 'navigate') {
     return
   }
 
@@ -129,10 +141,18 @@ self.addEventListener('fetch', (event) => {
           })
       })
       .catch(() => {
-        // Return offline page if available
+        // Always return a Response to avoid TypeError in respondWith
         if (event.request.destination === 'document') {
+          // Try cached index, else network index, else minimal offline page
           return caches.match('/index.html')
+            .then((res) => res || fetch(new Request('/index.html', { redirect: 'follow' })))
+            .catch(() => new Response('<!doctype html><title>Offline</title><h1>Offline</h1>', {
+              status: 503,
+              headers: { 'Content-Type': 'text/html' }
+            }))
         }
+        // Non-document request fallback
+        return new Response('', { status: 504 })
       })
   )
 })
@@ -207,14 +227,36 @@ async function handleContentPush(request) {
   }
 }
 
-// Handle ingest page route: always serve ingest.html; client will fetch content
+// Handle ingest page route safely: avoid recursion and redirected responses
 async function handleIngestRedirect(request) {
   try {
-    // Prefer cached ingest page
+    // 1) Prefer cached ingest page to avoid any redirects entirely
     const cached = await caches.match('/ingest.html')
-    if (cached) return cached
-    // Fallback to network fetch
-    return fetch('/ingest.html', { redirect: 'follow' })
+    if (cached) {
+      return cached
+    }
+
+    // 2) Fetch ingest.html directly (avoid requesting /ingest to prevent recursion)
+    try {
+      const resp = await fetch(new Request('/ingest.html', { cache: 'no-store', redirect: 'follow' }))
+      if (resp && resp.ok && resp.type !== 'opaqueredirect' && !resp.redirected) {
+        return resp
+      }
+      console.warn('Service Worker: Network ingest.html not usable', {
+        status: resp?.status,
+        redirected: resp?.redirected,
+        type: resp?.type
+      })
+    } catch (e) {
+      console.warn('Service Worker: Network fetch for ingest.html failed', e)
+    }
+
+    // 3) Final fallback: cached index
+    const index = await caches.match('/index.html')
+    if (index) return index
+
+    // Last resort: attempt network index (should not recurse)
+    return fetch(new Request('/index.html', { cache: 'no-store', redirect: 'follow' }))
   } catch (error) {
     console.error('Service Worker: Ingest route failed', error)
     // Final fallback: index
