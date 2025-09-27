@@ -1,6 +1,3 @@
 [submodule ".covid"]
 	url = git@github-cog32:cog32/covid-n.git
 	path = .covid
-[submodule ".covid/core"]
-	path = .covid/core
-	url = git@github-cog32:cog32/covid.git
