@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "[pre-commit] Running tests across repo and submodules..."
+
+fail_section() {
+  echo "[pre-commit] ERROR: $1" >&2
+  exit 1
+}
+
+run_node_tests() {
+  local dir="$1"
+  if [ -f "$dir/package.json" ]; then
+    if grep -q '"test"' "$dir/package.json"; then
+      echo "[pre-commit] Node tests in $dir"
+      (cd "$dir" && npm test --silent)
+    fi
+  fi
+}
+
+run_py_tests() {
+  local dir="$1"
+  if [ -d "$dir" ]; then
+    if [ -d "$dir/.venv" ]; then
+      # shellcheck disable=SC1091
+      source "$dir/.venv/bin/activate" || true
+    fi
+    if command -v pytest >/dev/null 2>&1; then
+      echo "[pre-commit] Python tests in $dir"
+      (cd "$dir" && pytest -q)
+    else
+      echo "[pre-commit] WARNING: pytest not found for $dir; skipping."
+      echo "            Create a venv at $dir/.venv and install deps to enable."
+    fi
+  fi
+}
+
+# Root repository tests (Node / Vitest)
+run_node_tests "."
+
+# Submodule .covid (Node / Jest)
+if [ -d ".covid" ]; then
+  run_node_tests ".covid"
+fi
+
+# Nested submodule core (Python / pytest)
+if [ -d ".covid/core" ]; then
+  run_py_tests ".covid/core"
+fi
+
+echo "[pre-commit] All configured test runs completed."

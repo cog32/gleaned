@@ -41,3 +41,20 @@ Where it’s used:
 - Ingest page: loads `/vendor/Readability.js` if needed and runs Readability on the received HTML.
 
 If loading fails (e.g., CSP blocking in bookmarklet context), the app falls back to a heuristic cleaner with improved spacing via `innerText` normalization.
+
+## Deploy to Cloudflare Pages
+
+- Prerequisites:
+  - Install Wrangler: `npm install -g wrangler`
+  - Authenticate once: `wrangler login`
+    - Or set env vars: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
+- Deploy from this (private) repo build:
+  - `python3 .covid/core/scripts/deploy_cloudflare_pages.py --deploy-local --project-name gleaned-covid`
+- Deploy from the public repo/branch:
+  - `python3 .covid/core/scripts/deploy_cloudflare_pages.py --project-name gleaned-covid --public-repo https://github.com/richardanaya/gleaned.git --branch main`
+- Optional flags:
+  - `--build-dir dist` (default)
+  - `--env-file .covid/core/.env` (default)
+
+Notes:
+- Navigations are handled by the browser (service worker skips `mode: navigate`), so Cloudflare's default pretty‑URL handling for `/ingest` works without extra redirects.
