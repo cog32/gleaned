@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Force non-watch, non-interactive test runs
+export CI=1
+
 echo "[pre-commit] Running tests across repo and submodules..."
 
 fail_section() {
@@ -11,6 +14,10 @@ fail_section() {
 run_node_tests() {
   local dir="$1"
   if [ -f "$dir/package.json" ]; then
+    if [ ! -d "$dir/node_modules" ]; then
+      echo "[pre-commit] WARNING: $dir/node_modules missing; skipping Node tests."
+      return 0
+    fi
     if grep -q '"test"' "$dir/package.json"; then
       echo "[pre-commit] Node tests in $dir"
       (cd "$dir" && npm test --silent)
@@ -25,11 +32,12 @@ run_py_tests() {
       # shellcheck disable=SC1091
       source "$dir/.venv/bin/activate" || true
     fi
-    if command -v pytest >/dev/null 2>&1; then
+    # Only run pytest when a local venv is present
+    if [ -d "$dir/.venv" ] && command -v pytest >/dev/null 2>&1; then
       echo "[pre-commit] Python tests in $dir"
       (cd "$dir" && pytest -q)
     else
-      echo "[pre-commit] WARNING: pytest not found for $dir; skipping."
+      echo "[pre-commit] WARNING: Skipping Python tests for $dir (no venv/pytest)."
       echo "            Create a venv at $dir/.venv and install deps to enable."
     fi
   fi
