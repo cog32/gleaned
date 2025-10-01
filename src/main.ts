@@ -1,24 +1,15 @@
-import { UrlInputComponent } from './components/url-input.js'
 import { ContentDisplayComponent } from './components/content-display.js'
-import { ContentService } from './services/content.service.js'
 import { ContentCleaner } from './utils/content-cleaner.js'
 import type { Article } from './types/content.js'
 
 class MainApp {
-  private urlInput: UrlInputComponent
   private contentDisplay: ContentDisplayComponent
-  private contentService: ContentService
   private playButton: HTMLButtonElement
   private currentArticle: Article | null = null
 
   constructor() {
-    this.contentService = new ContentService()
-    
     // Initialize components
-    const urlInputSection = document.getElementById('url-input-section')!
     const contentSection = document.getElementById('content-section')!
-    
-    this.urlInput = new UrlInputComponent(urlInputSection)
     this.contentDisplay = new ContentDisplayComponent(contentSection)
     
     this.playButton = document.getElementById('play-button') as HTMLButtonElement
@@ -29,57 +20,12 @@ class MainApp {
   }
 
   private setupEventListeners(): void {
-    this.urlInput.setLoadCallback((url: string) => {
-      this.loadContent(url)
-    })
-
     this.playButton.addEventListener('click', () => {
       this.navigateToReading()
     })
   }
 
-  private async loadContent(url: string): Promise<void> {
-    try {
-      this.urlInput.setLoading(true)
-      this.contentDisplay.showLoading()
-      this.playButton.disabled = true
-
-      const result = await this.contentService.extractContent(url)
-      
-      // Create article object
-      const article: Article = {
-        id: this.generateId(),
-        title: result.title,
-        author: result.author,
-        source: this.extractDomain(url),
-        url,
-        dateAdded: new Date().toLocaleDateString('en-US', { 
-          day: 'numeric', 
-          month: 'short', 
-          year: 'numeric' 
-        }),
-        readingTime: ContentCleaner.estimateReadingTime(result.wordCount),
-        wordCount: result.wordCount,
-        content: result.content,
-        cleanedContent: result.content
-      }
-
-      this.currentArticle = article
-      this.contentDisplay.render(article)
-      this.playButton.disabled = false
-
-      // Store in localStorage for reading page
-      localStorage.setItem('currentArticle', JSON.stringify(article))
-
-    } catch (error) {
-      console.error('Failed to load content:', error)
-      this.contentDisplay.showError(
-        error instanceof Error ? error.message : 'Unknown error occurred'
-      )
-    } finally {
-      this.urlInput.setLoading(false)
-    }
-  }
+  // URL-based loading removed in favor of bookmarklet and ingest flows
 
   private navigateToReading(): void {
     if (this.currentArticle) {
