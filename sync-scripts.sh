@@ -12,7 +12,10 @@ sync_from_public() {
 # Sync from private gleaned-covid TO public gleaned
 sync_to_public() {
     echo "Syncing from private gleaned-covid to public gleaned repo..."
-    ./copybara copy.bara.sky private_to_public --force
+    # Pass through any extra args to Copybara so callers can supply, e.g.,
+    #   --labels=release_title:Release\ v1.2.3
+    # or any other Copybara flags.
+    ./copybara copy.bara.sky private_to_public --force "$@"
 }
 
 # Show help
@@ -35,7 +38,10 @@ case "$1" in
         sync_from_public
         ;;
     "to-public")
-        sync_to_public
+        # Forward any extra args after 'to-public' to the copybara invocation
+        # so you can pass flags like --labels=release_title:My\ title
+        shift
+        sync_to_public "$@"
         ;;
     "help"|"--help"|"-h")
         show_help

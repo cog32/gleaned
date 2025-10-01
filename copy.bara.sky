@@ -55,9 +55,11 @@ private_to_public = core.workflow(
         url = "https://github.com/cog32/gleaned-covid.git",
         ref = "main",
     ),
-    destination = git.github_destination(
+    # Open a Pull Request against the public repo instead of pushing to main
+    destination = git.github_pr_destination(
         url = "https://github.com/cog32/gleaned.git",
-        push = "main",
+        destination_ref = "main",
+        # Omit pr_branch to let Copybara generate a unique branch per run
     ),
     origin_files = glob(["**"], exclude = [
         # Never sync private-only directories
@@ -80,9 +82,22 @@ private_to_public = core.workflow(
     ]),
     authoring = authoring.overwrite("Copybara <noreply@copybara.com>"),
     transformations = [
-        metadata.squash_notes(
-            prefix = "🔄 Synced to public gleaned repo\n\n",
+        # If a CLI label 'release_title' is provided (accessible as
+        # ${FLAG_RELEASE_TITLE}), set the commit/PR message to use it as the
+        # title and keep the existing message as the body. If the label is not
+        # present, this transform is a no-op.
+        metadata.replace_message(
+            "${FLAG_RELEASE_TITLE}\n\n${COPYBARA_CURRENT_MESSAGE}",
+            ignore_label_not_found = True,
+        ),
+        # If a CLI label 'issue' is provided (accessible as ${FLAG_ISSUE}),
+        # append an auto-linking close directive to the PR body so the PR
+        # references (and closes) the corresponding GitHub issue on merge.
+        metadata.replace_message(
+            "${COPYBARA_CURRENT_MESSAGE}\n\nCloses #${FLAG_ISSUE}",
+            ignore_label_not_found = True,
         ),
     ],
-    mode = "CHANGE_REQUEST_FROM_SOT",
+    # Use SQUASH for a single-commit PR (cleaner history)
+    mode = "SQUASH",
 )
