@@ -1,0 +1,40 @@
+
+working on github issue 2, removing the URL
+- Completed Stage 1. 
+- Completed Stage 2.
+- Completed Stage 3.
+- Completed Stage 4.
+- Completed Stage 5. 
+ 
+2025-10-20 Stage 1 notes:
+- Current git branch: 1-remove-url-box-main-page
+- Likely related GitHub issue: #1 ([PAID] Remove the URL box from the main page)
+- Mismatch: .current_work.ai mentions issue 2, but repository shows only issue #1 (closed).
+
+2025-10-20 Stage 2 notes:
+- Queried GitHub issues for repo cog32/gleaned-covid using gh.
+- No open issues found. Issue #1 is CLOSED; no issue #2 exists.
+
+2025-10-20 Stage 6 (Change Review):
+- Ran root unit tests via vitest (non-watch): all 56 tests passed.
+- Ran root BDD in dry-run to avoid hang: many undefined steps (expected; placeholders), no execution.
+- Ran .covid/core Python tests in venv: multiple failures unrelated to this feature (Stripe webhook + placeholder module import). Not modifying core for this front-end issue.
+- Ran markdownlint and remark link validation: warnings mainly in submodule docs/node_modules; no critical issues in root docs.
+- Code review: main page no longer renders URL input; component file and styles remain but unused; keeping scope minimal per process.
+
+Next: push branch and open PR referencing cog32/covid-gleaned#2; update public issue with status after PR creation.
+
+2025-10-20 Stage 6 outcome:
+- Branch pushed: 1-remove-url-box-main-page
+- PR opened: https://github.com/cog32/gleaned-covid/pull/5
+- Ready for Stage 7 (Deploy Prototype) if approved.
+
+2025-10-20 Stage 7 (Deploy Prototype):
+- Deployed via: python3 .covid/core/scripts/deploy_cloudflare_pages.py --deploy-local --project-name gleaned-covid
+- Deployed URL: https://0e13c3a4.gleaned-covid.pages.dev
+- Updated original issue (cog32/covid-gleaned#2) with URL and @cog32 mention.
+
+2025-10-20 Cleanup:
+- Removed unused URL input component and related CSS.
+- Files changed: deleted src/components/url-input.ts; pruned URL-input styles in src/styles/main.css.
+- All unit tests still pass (56/56).
