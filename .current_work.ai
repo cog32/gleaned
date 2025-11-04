@@ -1,0 +1,90 @@
+# Current Work Tracking
+
+## Issue #6: Keep word/image visible when paused
+- **Original Issue**: cog32/gleaned#9
+- **Type**: UI Enhancement Feature
+- **Status**: Starting
+
+### Description
+When the pause button is pressed, instead of displaying "paused" text, keep the current word or image visible. This allows users to look at the content for longer periods or take breaks without the distraction of a "paused" message.
+
+### Current Stage
+Stage 5: Implementation COMPLETE
+
+### Plan
+1. ✅ Orient and understand current state
+2. ✅ Find next issue (#6)
+3. ✅ Create .current_work.ai and clarify requirements
+4. ✅ Create workspace (checkout branch: feat/ui/6-keep-word-visible-when-paused)
+5. ✅ Implement feature:
+   - ✅ Find pause button handler in codebase (src/reading.ts:224)
+   - ✅ Locate where "paused" message is displayed (showPause() method)
+   - ✅ Modified to keep current word/image visible (commented out showPause call)
+   - ✅ Added test in tests/features/reading-page.spec.ts
+   - ✅ All 57 tests passing
+   - ✅ Build successful
+6. 🔄 Run change review process
+7. ⏳ Deploy prototype and update issue
+
+### Notes
+- Payment confirmed
+- Issue is marked as ready-for-dev-machine
+
+### Implementation Details
+**Files Modified:**
+1. `/Users/richard/cog32/gleaned-covid/src/reading.ts` (line 228-229)
+   - Commented out `this.rsvpDisplay.showPause('Paused')`
+   - Added comment explaining the change
+
+2. `/Users/richard/cog32/gleaned-covid/tests/features/reading-page.spec.ts` (lines 96-121)
+   - Added new test: "should keep current word visible when paused (not show 'Paused' text)"
+   - Test verifies word remains visible and .pause-indicator is not added
+
+**Test Results:**
+- All 57 tests passing
+- Build successful with no errors
+
+**Visual Indicators Still Present:**
+- Progress bar shows "Paused" status
+- Play/pause button updates to show paused state
+- Only the word/image display keeps showing current content
+
+## BDD Feature Description
+
+### Feature: Keep word/image visible when paused
+
+**As a** user reading content with the RSVP reader
+**I want** the current word or image to remain visible when I pause
+**So that** I can study or look at the content for as long as I need without distraction
+
+**Acceptance Criteria:**
+
+**Scenario: User pauses reading on a word**
+- Given I am reading content in RSVP mode
+- And a word is currently displayed (e.g., "example")
+- When I press the pause button
+- Then the word "example" should remain visible
+- And the word should NOT be replaced with "Paused" text
+- And the play button should change to show the paused state
+
+**Scenario: User pauses reading on an image**
+- Given I am reading content that includes images
+- And an image is currently displayed
+- When I press the pause button
+- Then the image should remain visible
+- And the image should NOT be replaced with "Paused" text
+
+### Technical Implementation Notes
+
+**Files to modify:**
+1. `/Users/richard/cog32/gleaned-covid/src/reading.ts` (line 228) - Remove `showPause()` call
+2. `/Users/richard/cog32/gleaned-covid/src/components/rsvp-display.ts` - May need to update pause styling
+3. `/Users/richard/cog32/gleaned-covid/tests/features/reading-page.spec.ts` - Add/update tests
+
+**Current behavior:**
+- `pause()` method calls `this.rsvpDisplay.showPause('Paused')`
+- This replaces current content with a "Paused" message
+
+**New behavior:**
+- Keep current word/image displayed
+- Optionally add subtle visual indicator (CSS class) without replacing content

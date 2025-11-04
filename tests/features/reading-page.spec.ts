@@ -79,18 +79,45 @@ describe('RSVP Reading Page Features', () => {
       `
 
       const btn = document.querySelector('#play-pause-btn') as HTMLButtonElement
-      
+
       // Simulate play state
       btn.textContent = '⏸️'
       btn.dataset.playing = 'true'
       expect(btn.textContent).toBe('⏸️')
       expect(btn.dataset.playing).toBe('true')
-      
+
       // Simulate pause state
       btn.textContent = '▶️'
       btn.dataset.playing = 'false'
       expect(btn.textContent).toBe('▶️')
       expect(btn.dataset.playing).toBe('false')
+    })
+
+    it('should keep current word visible when paused (not show "Paused" text)', () => {
+      // Setup: Display with a word showing
+      document.body.innerHTML = `
+        <div id="app">
+          <div id="rsvp-display" class="rsvp-display">
+            <div id="current-word" class="current-word">
+              <span class="word-prefix">ex</span><span class="orp">a</span><span class="word-suffix">mple</span>
+            </div>
+          </div>
+        </div>
+      `
+
+      const currentWordEl = document.querySelector('#current-word') as HTMLElement
+      const originalContent = currentWordEl.innerHTML
+
+      // Verify the word is displayed
+      expect(currentWordEl.textContent?.trim()).toBe('example')
+      expect(currentWordEl.querySelector('.orp')).toBeTruthy()
+
+      // When paused, the word should remain visible (not be replaced with "Paused")
+      // The old behavior would replace innerHTML with: <span class="pause-indicator">Paused</span>
+      // The new behavior should keep the original word visible
+      expect(currentWordEl.innerHTML).toBe(originalContent)
+      expect(currentWordEl.querySelector('.pause-indicator')).toBeNull()
+      expect(currentWordEl.textContent?.trim()).not.toBe('Paused')
     })
 
     it('should have speed adjustment controls', () => {
