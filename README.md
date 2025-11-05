@@ -10,9 +10,18 @@ This is an open source, local first progressive web app for speed reading.  This
 
 # TODO The usage should be self explanatory
 
-## Reading Page Modes
+## Debug Mode
 
-The reading page now has two modes:
+Debug mode can be enabled by appending `?debug=1` to any page URL. Different pages show different debug information:
+
+### Main Page Debug
+
+- Shows service worker status and registration information
+- Example: `http://localhost:3000/?debug=1`
+
+### Reading Page Debug
+
+The reading page has two modes:
 
 - Minimal (default): shows only Faster and Slower buttons plus the Back button. The session auto‑starts.
 - Debug (optional): shows the full control surface (play/pause, presets, slider, navigation, settings, progress, ORP/key‑term visuals).
