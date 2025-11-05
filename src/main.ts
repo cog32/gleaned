@@ -170,8 +170,18 @@ class MainApp {
 
 // Service Worker Registration
 async function registerServiceWorker() {
+  // Check if debug mode is enabled
+  const urlParams = new URLSearchParams(window.location.search)
+  const isDebugMode = urlParams.get('debug') === '1'
+
+  // Show service worker status only in debug mode
+  const statusContainer = document.getElementById('sw-status')
+  if (isDebugMode && statusContainer) {
+    statusContainer.style.display = 'block'
+  }
+
   const statusEl = document.getElementById('sw-status-text')
-  
+
   if ('serviceWorker' in navigator) {
     try {
       const isDev = import.meta.env.DEV
