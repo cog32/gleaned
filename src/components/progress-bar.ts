@@ -200,14 +200,8 @@ export class ProgressBarComponent {
     progressMarker.style.left = `${clampedPercent}%`
     this.lastPercent = clampedPercent
 
-    // Update progress bar color based on completion
-    if (clampedPercent < 25) {
-      progressFill.className = 'progress-fill progress-start'
-    } else if (clampedPercent < 75) {
-      progressFill.className = 'progress-fill progress-middle'
-    } else {
-      progressFill.className = 'progress-fill progress-end'
-    }
+    // Keep progress bar a constant color
+    progressFill.className = 'progress-fill'
   }
 
   setSeekHandler(handler: (percent: number) => void): void {
