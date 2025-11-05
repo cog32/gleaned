@@ -225,7 +225,8 @@ class ReadingApp {
     this.readingService.pause()
     this.readingControls.setPlayState(false)
     this.progressBar.setSessionStatus('paused')
-    this.rsvpDisplay.showPause('Paused')
+    // Keep the current word/image visible instead of showing "Paused" text
+    // this.rsvpDisplay.showPause('Paused')
   }
 
   private togglePlayPause(): void {

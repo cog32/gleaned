@@ -56,7 +56,54 @@ body {
   padding: 2rem 1rem;
 }
 
-/* URL Input styles removed (component deprecated) */
+/* URL Input */
+.url-input-container {
+  margin-bottom: 2rem;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.url-input {
+  flex: 1;
+  padding: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.url-input:focus {
+  border-color: #007bff;
+}
+
+.url-input:invalid {
+  border-color: #dc3545;
+}
+
+.load-button {
+  padding: 1rem 2rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.load-button:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.load-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
 
 /* Article Display */
 .article-display {
@@ -265,6 +312,10 @@ body {
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
+  }
+  
+  .input-group {
+    flex-direction: column;
   }
   
   .article-title {

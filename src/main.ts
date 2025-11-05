@@ -8,7 +8,6 @@ class MainApp {
   private currentArticle: Article | null = null
 
   constructor() {
-    
     // Initialize components
     const contentSection = document.getElementById('content-section')!
     this.contentDisplay = new ContentDisplayComponent(contentSection)
