@@ -4,25 +4,27 @@ import type { Article } from './types/content.js'
 
 class MainApp {
   private contentDisplay: ContentDisplayComponent
-  private playButton: HTMLButtonElement
+  private playButton: HTMLButtonElement | null
   private currentArticle: Article | null = null
 
   constructor() {
     // Initialize components
     const contentSection = document.getElementById('content-section')!
     this.contentDisplay = new ContentDisplayComponent(contentSection)
-    
-    this.playButton = document.getElementById('play-button') as HTMLButtonElement
-    
+
+    this.playButton = document.getElementById('play-button') as HTMLButtonElement | null
+
     this.setupEventListeners()
     this.showBookmarkletSection()
     this.checkForViewMode()
   }
 
   private setupEventListeners(): void {
-    this.playButton.addEventListener('click', () => {
-      this.navigateToReading()
-    })
+    if (this.playButton) {
+      this.playButton.addEventListener('click', () => {
+        this.navigateToReading()
+      })
+    }
   }
 
   // URL-based loading removed in favor of bookmarklet and ingest flows
@@ -133,8 +135,10 @@ class MainApp {
       
       this.currentArticle = article
       this.contentDisplay.render(article)
-      this.playButton.disabled = false
-      
+      if (this.playButton) {
+        this.playButton.disabled = false
+      }
+
       // Store in localStorage for reading page
       localStorage.setItem('currentArticle', JSON.stringify(article))
       
@@ -152,7 +156,9 @@ class MainApp {
           this.currentArticle = JSON.parse(storedArticle)
           if (this.currentArticle) {
             this.contentDisplay.render(this.currentArticle)
-            this.playButton.disabled = false
+            if (this.playButton) {
+              this.playButton.disabled = false
+            }
           }
         } catch (error) {
           console.error('Failed to load stored article:', error)
