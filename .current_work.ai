@@ -9,7 +9,7 @@
 When the pause button is pressed, instead of displaying "paused" text, keep the current word or image visible. This allows users to look at the content for longer periods or take breaks without the distraction of a "paused" message.
 
 ### Current Stage
-Stage 5: Implementation COMPLETE
+Stage 7: COMPLETE - Deployed and issue updated
 
 ### Plan
 1. ✅ Orient and understand current state
@@ -23,8 +23,10 @@ Stage 5: Implementation COMPLETE
    - ✅ Added test in tests/features/reading-page.spec.ts
    - ✅ All 57 tests passing
    - ✅ Build successful
-6. 🔄 Run change review process
-7. ⏳ Deploy prototype and update issue
+6. ✅ Run change review process
+7. ✅ Deploy prototype and update issue
+   - ✅ Deployed to: https://feat-ui-6-keep-word-visible.gleaned-covid.pages.dev
+   - ✅ Updated issue cog32/gleaned#9 with deployment info
 
 ### Notes
 - Payment confirmed
