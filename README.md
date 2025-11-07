@@ -2,9 +2,9 @@
 
 ## Overview
 
-This is an RSVP speed reading app. Importantly, it's an open source progressive web app. This means no installation, you simply visit the webpage and that's it. The app lives inside your browser, you never have to sign up and your data is always yours.
+This is an open source, local first progressive web app for speed reading.  This just means instead of installing an app, you  visit a webpage and that's it. The app lives inside your browser, you never have to sign up and your data is always yours.
 
-If you find this project useful, consider a small donation to keep the lights on.
+If you find this project at all useful, consider a small donation for the time you save
 
 ☕ *[Buy me a coffee](https://buymeacoffee.com/cog32)*
 
@@ -16,7 +16,7 @@ Simply visit the page, [Gleaned](https://gleaned.pages.dev/) to try it out! No A
 
 Find an article to read, then click your bookmarklet.
 
-![How to use Gleaned](public/demo.opt.gif)
+  #todo the video of the how to use.
 
 ## Credits
 

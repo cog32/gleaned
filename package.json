@@ -8,8 +8,6 @@
     "build": "tsc && vite build && mkdir -p dist/bridge && mv dist/bridge.html dist/bridge/index.html",
     "preview": "vite preview",
     "test": "vitest",
-    "test:ci": "vitest run",
-    "verify": "npm run build && vitest run",
     "test:ui": "vitest --ui",
     "test:bdd": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm node_modules/@cucumber/cucumber/bin/cucumber-js --import features/step_definitions/**/*.ts",
     "test:bdd:dry": "TS_NODE_TRANSPILE_ONLY=1 node --loader ts-node/esm node_modules/@cucumber/cucumber/bin/cucumber-js --import features/step_definitions/**/*.ts --dry-run",
