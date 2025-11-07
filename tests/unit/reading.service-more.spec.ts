@@ -49,7 +49,7 @@ describe('ReadingService extra coverage', () => {
       { text: '.', prefix: '', orp: '.', suffix: '', displayTime: 100, isKeyTerm: false, isPunctuation: true, isFunctionWord: false, isImage: false },
       { text: 'Next', prefix: 'N', orp: 'e', suffix: 'xt', displayTime: 100, isKeyTerm: false, isPunctuation: false, isFunctionWord: false, isImage: false },
     ]
-    const session = svc.startSession('art')
+    svc.startSession('art')
     // Jump to end
     svc.jumpToEnd()
     expect((svc as any)['session'].currentWordIndex).toBe(4)
