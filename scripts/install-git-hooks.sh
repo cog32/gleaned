@@ -3,4 +3,7 @@ set -euo pipefail
 
 git config core.hooksPath .githooks
 chmod +x .githooks/pre-commit
-echo "Git hooks installed. Pre-commit will run tests across repo and submodules."
+chmod +x .githooks/pre-push || true
+echo "Git hooks installed."
+echo "- pre-commit: unit + BDD (optional E2E if runner installed)"
+echo "- pre-push: unit + BDD + E2E (required)"

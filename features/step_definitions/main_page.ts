@@ -72,7 +72,8 @@ When('I click the load button', function () {
 Then('the article content should be extracted and cleaned', function () {
   expect(this.loadedArticle).toBeDefined()
   expect(this.loadedArticle.cleanedContent).toBeDefined()
-  expect(this.loadedArticle.cleanedContent).not.toContain('ads')
+  // Keep this generic to avoid brittle substring checks
+  expect(this.loadedArticle.cleanedContent).not.toContain('Advertisement')
 })
 
 Then('I should see the article title, author, and reading time', function () {

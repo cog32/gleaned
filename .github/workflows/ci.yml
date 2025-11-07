@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  unit_bdd:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Install Vitest coverage provider (no-save)
+        run: npm i -D @vitest/coverage-v8 --no-save
+      - name: Unit tests (Vitest)
+        run: ./scripts/run_unit_tests.sh
+      - name: BDD tests (Cucumber)
+        run: ./scripts/run_feature_tests.sh
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: unit_bdd
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Install Playwright test runner (no-save)
+        run: npm i -D @playwright/test --no-save
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+      - name: E2E tests (Playwright)
+        run: ./scripts/run_e2e_tests.sh

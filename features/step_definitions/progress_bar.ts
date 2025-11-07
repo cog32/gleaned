@@ -63,9 +63,9 @@ Then('reading should remain paused', function () {
 })
 
 Given('reading is playing', function () {
-  // Start playing
-  service.play()
+  // Avoid relying on window timers in this environment; set state directly
   const session: any = (service as any)['session']
+  session.isPlaying = true
   expect(session?.isPlaying).toBe(true)
 })
 

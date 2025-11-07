@@ -9,7 +9,11 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: #333;
   background: #fff;
-  overflow-x: hidden;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-height: 100vh;
 }
 
 /* Header */
@@ -48,11 +52,16 @@ body {
 .reading-container {
   display: flex;
   flex-direction: column;
-  min-height: calc(100vh - 80px);
+  flex: 1;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
-  gap: 2rem;
+  padding: 0.5rem;
+  gap: 0.5rem;
+  overflow-y: auto;
+  width: 100%;
+  min-height: 0;
+  /* Ensure content doesn’t hide behind footer or minimal controls */
+  padding-bottom: calc(var(--footer-height, 56px) + 24px);
 }
 
 /* RSVP Display */
@@ -265,13 +274,13 @@ body {
 .reading-controls {
   background: #f9fafb;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 0.75rem;
   border: 1px solid #e5e7eb;
 }
 
 .main-controls {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
 }
 
 .play-pause-btn {
@@ -297,7 +306,7 @@ body {
 }
 
 .speed-controls {
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
 }
 
 .speed-presets {
@@ -373,8 +382,8 @@ body {
 .navigation-controls {
   display: flex;
   justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
   flex-wrap: wrap;
 }
 
@@ -443,12 +452,12 @@ body {
 .progress-container {
   background: #f9fafb;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 0.75rem;
   border: 1px solid #e5e7eb;
 }
 
 .progress-bar-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .progress-bar {
@@ -488,8 +497,8 @@ body {
 .progress-stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .stat-group {
@@ -700,7 +709,9 @@ body.minimal .reading-controls .settings-controls,
 body.minimal .reading-controls .main-controls { display: none; }
 body.minimal .reading-controls.minimal { 
   position: fixed; left: 50%; transform: translateX(-50%);
-  bottom: 24px; z-index: 200;
+  /* Sit above the footer and safe-area */
+  bottom: calc(env(safe-area-inset-bottom) + var(--footer-height, 56px) + 12px);
+  z-index: 200;
   padding: 8px 12px; border-radius: 999px; background: #fff;
   border: 1px solid #e5e7eb; box-shadow: 0 8px 24px rgba(0,0,0,0.08);
 }
@@ -723,3 +734,10 @@ body.minimal .reading-controls.minimal .play-pause-minimal i { width: 28px; heig
 .reading-controls .play-pause-btn i,
 .reading-controls.minimal .speed-btn i,
 .reading-controls.minimal .play-pause-minimal i { width: 24px; height: 24px; }
+
+/* Footer Layout */
+#support-footer {
+  flex-shrink: 0;
+  margin-top: 0 !important;
+  padding: 0.5rem 1rem !important;
+}
