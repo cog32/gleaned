@@ -18,12 +18,12 @@ class ReadingApp {
   constructor() {
     this.articleTitleElement = document.getElementById('article-title')!
     this.readingService = new ReadingService()
-    
+
     // Initialize components
     this.rsvpDisplay = new RSVPDisplayComponent(
       document.getElementById('rsvp-display')!
     )
-    
+
     // Default settings
     const defaultSettings: RSVPSettings = {
       speed: 250,
@@ -34,14 +34,18 @@ class ReadingApp {
       orpEnabled: false,
       sessionTimeLimit: 20
     }
-    
+
+    // Load saved settings from localStorage
+    const savedSettings = this.loadSettings()
+    const settings = { ...defaultSettings, ...savedSettings }
+
     const isDebug = new URLSearchParams(window.location.search).get('debug') === '1'
     document.body.classList.toggle('debug', isDebug)
     document.body.classList.toggle('minimal', !isDebug)
 
     this.readingControls = new ReadingControlsComponent(
       document.getElementById('reading-controls')!,
-      defaultSettings,
+      settings,
       !isDebug // minimal by default, full controls in debug
     )
     
@@ -65,6 +69,7 @@ class ReadingApp {
 
     this.readingControls.setSpeedChangeHandler((speed: number) => {
       this.readingService.updateSettings({ speed })
+      this.saveSettings({ speed })
     })
 
     this.readingControls.setReplaySentenceHandler(() => {
@@ -83,6 +88,7 @@ class ReadingApp {
     document.getElementById('reading-controls')!.addEventListener('settingsChange', ((e: CustomEvent) => {
       const settings = e.detail.settings as RSVPSettings
       this.readingService.updateSettings(settings)
+      this.saveSettings(settings)
     }) as EventListener)
 
     // Toggle progress details when clicking on the current word area
@@ -248,7 +254,7 @@ class ReadingApp {
   private showError(message: string): void {
     this.rsvpDisplay.showError(message)
     this.progressBar.setSessionStatus('error')
-    
+
     // Show fallback error in main container if RSVP display fails
     const rsvpSection = document.getElementById('rsvp-section')!
     if (!rsvpSection.querySelector('.error-indicator')) {
@@ -256,12 +262,34 @@ class ReadingApp {
         <div style="text-align: center; padding: 3rem; color: #dc2626;">
           <h2>Error</h2>
           <p>${message}</p>
-          <button onclick="window.location.href='index.html'" 
+          <button onclick="window.location.href='index.html'"
                   style="margin-top: 1rem; padding: 0.75rem 1.5rem; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer;">
             Go Back to Main Page
           </button>
         </div>
       `
+    }
+  }
+
+  private loadSettings(): Partial<RSVPSettings> {
+    try {
+      const stored = localStorage.getItem('rsvpSettings')
+      if (stored) {
+        return JSON.parse(stored)
+      }
+    } catch (error) {
+      console.error('Failed to load settings from localStorage:', error)
+    }
+    return {}
+  }
+
+  private saveSettings(settings: Partial<RSVPSettings>): void {
+    try {
+      const currentSettings = this.loadSettings()
+      const updatedSettings = { ...currentSettings, ...settings }
+      localStorage.setItem('rsvpSettings', JSON.stringify(updatedSettings))
+    } catch (error) {
+      console.error('Failed to save settings to localStorage:', error)
     }
   }
 }
