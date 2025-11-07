@@ -10,7 +10,7 @@ If you find this project at all useful, consider a small donation for the time y
 
 ## Installation
 
-Simply visit the page, [Gleaned](https://gleaned-covid.pages.dev/) to try it out! No Apps, installs or signups.
+Simply visit the page, [Gleaned](https://gleaned.pages.dev/) to try it out! No Apps, installs or signups.
 
 ## Usage
 
