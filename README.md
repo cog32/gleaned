@@ -16,7 +16,7 @@ Simply visit the page, [Gleaned](https://gleaned.pages.dev/) to try it out! No A
 
 Find an article to read, then click your bookmarklet.
 
-  #todo the video of the how to use.
+![How to use Gleaned](demo.opt.gif)
 
 ## Credits
 
