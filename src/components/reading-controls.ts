@@ -28,6 +28,7 @@ export class ReadingControlsComponent {
     if (this.minimal) {
       this.container.innerHTML = `
         <div class="reading-controls minimal">
+          <div id="wpm-display" class="wpm-display wpm-display-minimal">${this.currentSpeed} WPM</div>
           <div class="speed-minimal">
             <button id="speed-down" class="speed-btn" aria-label="Slower"><i data-lucide="minus"></i></button>
             <button id="minimal-play-pause" class="play-pause-minimal" data-playing="true" aria-label="Pause"><i data-lucide="pause"></i></button>
@@ -43,6 +44,7 @@ export class ReadingControlsComponent {
       <div class="reading-controls">
         <!-- Main Play/Pause Control -->
         <div class="main-controls">
+          <div id="wpm-display" class="wpm-display">${this.currentSpeed} WPM</div>
           <button id="play-pause-btn" class="play-pause-btn" data-playing="false" aria-label="Play/Pause">
             <i id="play-pause-icon" data-lucide="play"></i>
           </button>
@@ -352,7 +354,10 @@ export class ReadingControlsComponent {
   private updateSpeedDisplay(speed: number): void {
     const display = this.container.querySelector('#speed-display') as HTMLElement | null
     if (display) display.textContent = `${speed} WPM`
-    
+
+    const wpmDisplay = this.container.querySelector('#wpm-display') as HTMLElement | null
+    if (wpmDisplay) wpmDisplay.textContent = `${speed} WPM`
+
     const slider = this.container.querySelector('#speed-slider') as HTMLInputElement | null
     if (slider) slider.value = speed.toString()
   }

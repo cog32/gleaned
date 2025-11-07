@@ -281,6 +281,23 @@ body {
 .main-controls {
   text-align: center;
   margin-bottom: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wpm-display {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  padding: 0.5rem 1rem;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+  min-width: 120px;
+  text-align: center;
 }
 
 .play-pause-btn {
@@ -727,6 +744,23 @@ body.minimal .reading-controls.minimal .speed-btn:hover,
 body.minimal .reading-controls.minimal .play-pause-minimal:hover { background: #f3f4f6; }
 body.minimal .reading-controls.minimal .speed-btn i,
 body.minimal .reading-controls.minimal .play-pause-minimal i { width: 28px; height: 28px; }
+body.minimal .wpm-display-minimal {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(env(safe-area-inset-bottom) + var(--footer-height, 56px) + 80px);
+  z-index: 199;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  padding: 0.5rem 1rem;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+  min-width: 100px;
+  text-align: center;
+}
 .back-button i { color: #111827; }
 /* Icon sizing */
 .back-button i,
