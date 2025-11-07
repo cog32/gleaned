@@ -9,7 +9,20 @@ export default defineConfig({
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
-      '.covid/**'
-    ]
+      '.covid/**',
+      'e2e/**'
+    ],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'lcov', 'json-summary'],
+      reportsDirectory: 'coverage',
+      reportOnFailure: true,
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 70,
+        statements: 80,
+      },
+    },
   }
 })

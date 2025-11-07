@@ -323,5 +323,14 @@ class IngestApp {
 
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+  // Compute footer height for layout spacing (used by CSS var)
+  const setFooterHeightVar = () => {
+    const footer = document.getElementById('support-footer') as HTMLElement | null
+    const h = footer ? footer.offsetHeight : 0
+    document.documentElement.style.setProperty('--footer-height', `${h}px`)
+  }
+  setFooterHeightVar()
+  window.addEventListener('resize', setFooterHeightVar)
+
   new IngestApp()
 })

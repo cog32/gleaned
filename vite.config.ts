@@ -1,7 +1,56 @@
 import { defineConfig } from 'vite'
+import { createHtmlPlugin } from 'vite-plugin-html'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+const footerHtml = `
+<footer id="support-footer" style="margin-top: 0; padding: 0.5rem 1rem; text-align: center; border-top: 1px solid #e0e0e0;">
+  <p style="margin: 0; color: #666; font-size: 0.9rem;">
+    Enjoying Gleaned?
+    <a id="buy-me-coffee-link" href="https://buymeacoffee.com/cog32" target="_blank" rel="noopener noreferrer" style="color: #007bff; text-decoration: none;">
+      ☕ Buy me a coffee
+    </a>
+  </p>
+</footer>
+`
 
 export default defineConfig({
   plugins: [
+    createHtmlPlugin({
+      minify: true,
+      pages: [
+        {
+          filename: 'index.html',
+          template: 'index.html',
+          injectOptions: {
+            data: { footer: footerHtml },
+          },
+        },
+        {
+          filename: 'reading.html',
+          template: 'reading.html',
+          injectOptions: {
+            data: { footer: footerHtml },
+          },
+        },
+        {
+          filename: 'ingest.html',
+          template: 'ingest.html',
+          injectOptions: {
+            data: { footer: footerHtml },
+          },
+        },
+        {
+          filename: 'bridge/index.html',
+          template: 'bridge/bridge.html',
+          injectOptions: {
+            data: { footer: '' },
+          },
+        },
+      ],
+    }),
     {
       name: 'gleaned-push-endpoint',
       configureServer(server) {
@@ -91,7 +140,12 @@ export default defineConfig({
         main: 'index.html',
         reading: 'reading.html',
         ingest: 'ingest.html',
-        bridge: 'bridge/index.html'
+        bridge: 'bridge/bridge.html'
+      },
+      output: {
+        assetFileNames: 'assets/[name]-[hash][extname]',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js'
       }
     }
   },

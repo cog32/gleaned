@@ -10,6 +10,9 @@ body {
   line-height: 1.6;
   color: #333;
   background: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* Header */
@@ -54,6 +57,8 @@ body {
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem 1rem;
+  flex: 1;
+  overflow-y: auto;
 }
 
 /* URL Input */
@@ -335,4 +340,11 @@ body {
   .bookmarklet-help {
     padding: 1.5rem;
   }
+}
+
+/* Footer Layout */
+#support-footer {
+  flex-shrink: 0;
+  margin-top: 0 !important;
+  padding: 0.5rem 1rem !important;
 }
