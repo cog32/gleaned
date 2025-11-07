@@ -2,9 +2,9 @@
 
 ## Overview
 
-This is an open source, local first progressive web app for speed reading.  This just means instead of installing an app, you  visit a webpage and that's it. The app lives inside your browser, you never have to sign up and your data is always yours.
+This is an RSVP speed reading app. Importantly, it's an open source progressive web app. This means no installation, you simply visit the webpage and that's it. The app lives inside your browser, you never have to sign up and your data is always yours.
 
-If you find this project at all useful, consider a small donation for the time you save
+If you find this project useful, consider a small donation to keep the lights on.
 
 ☕ *[Buy me a coffee](https://buymeacoffee.com/cog32)*
 
