@@ -32,21 +32,39 @@
         <!-- Bookmarklet Section -->
         <div id="bookmarklet-section" class="bookmarklet-section" style="display: none;">
             <h2>📖 Read Any Article with Gleaned</h2>
-            <p>Drag this bookmarklet to your bookmarks bar, then click it on any article to start speed reading:</p>
+            <p>Add this bookmarklet to your browser, then click it on any article to start speed reading:</p>
 
             <div class="bookmarklet-container">
-                <a id="bookmarklet-link" href="javascript:void(0)"
-                    class="bookmarklet-link" onclick="return false;">
+                <a id="bookmarklet-link" href="javascript:void(0)" class="bookmarklet-link">
                     📖 Gleaned
                 </a>
+            </div>
+
+            <div class="bookmarklet-instructions">
+                <p>
+                    <strong>On desktop:</strong> Drag the button above to your bookmarks bar.<br>
+                    <strong>On iPhone/iPad:</strong> Use the text box below - tap to select all, then copy and paste into a new bookmark's URL field.
+                </p>
+            </div>
+
+            <div id="mobile-copy-section" class="mobile-copy-section">
+                <label for="bookmarklet-code">Bookmarklet Code (for mobile):</label>
+                <textarea
+                    id="bookmarklet-code"
+                    class="bookmarklet-code-text"
+                    readonly
+                    rows="3"></textarea>
+                <button id="copy-button" class="copy-button">📋 Copy to Clipboard</button>
+                <span id="copy-feedback" class="copy-feedback"></span>
             </div>
 
             <div class="bookmarklet-help">
                 <h3>How to use:</h3>
                 <ol>
-                    <li>Drag the "📖 Gleaned" button above to your bookmarks bar</li>
+                    <li><strong>Desktop:</strong> Drag the "📖 Gleaned" button above to your bookmarks bar</li>
+                    <li><strong>Mobile:</strong> Tap and hold, copy the link, create a new bookmark and paste</li>
                     <li>Navigate to any article on the web</li>
-                    <li>Click the bookmarklet in your bookmarks bar</li>
+                    <li>Click/tap the bookmarklet in your bookmarks</li>
                     <li>The article will be extracted and opened in Gleaned</li>
                 </ol>
             </div>

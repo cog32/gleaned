@@ -40,36 +40,64 @@
     <script>
       // Register service worker first
       async function registerServiceWorker() {
-        if (!('serviceWorker' in navigator)) return;
-        try {
-          console.log('[Bridge] Registering service worker...');
-          const registration = await navigator.serviceWorker.register('/sw.js?v=' + Date.now(), { scope: '/' });
-          console.log('[Bridge] Service Worker registered:', registration.scope);
-
-          // Wait for active worker
-          await navigator.serviceWorker.ready;
-          console.log('[Bridge] Service Worker is ready');
-
-          // Ensure this page is controlled before using /push
-          if (!navigator.serviceWorker.controller) {
-            console.log('[Bridge] SW active but not controlling this page - reloading to claim control');
-            const key = 'gleaned-bridge-sw-reloaded';
-            if (!sessionStorage.getItem(key)) {
-              sessionStorage.setItem(key, '1');
-              setTimeout(() => window.location.reload(), 300);
-              throw new Error('Reloading to get SW control');
-            } else {
-              console.warn('[Bridge] SW still not controlling after reload');
-            }
+        if ('serviceWorker' in navigator) {
+          try {
+            console.log('[Bridge] Registering service worker...');
+            const registration = await navigator.serviceWorker.register('/sw.js?v=' + Date.now(), {
+              scope: '/'
+            });
+            console.log('[Bridge] Service Worker registered:', registration.scope);
+            await navigator.serviceWorker.ready;
+            console.log('[Bridge] Service Worker is ready');
+          } catch (error) {
+            console.warn('[Bridge] Service Worker registration failed:', error);
           }
-        } catch (error) {
-          console.warn('[Bridge] Service Worker registration failed:', error);
+        }
+      }
+
+      // Verify service worker is actively handling requests (Safari fix)
+      async function verifyServiceWorkerActive(maxAttempts = 10, initialDelay = 50) {
+        if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) {
+          console.log('[Bridge] No service worker controller, skipping verification');
+          return;
+        }
+
+        console.log('[Bridge] Verifying service worker is active...');
+        let attempt = 0;
+        let delay = initialDelay;
+
+        while (attempt < maxAttempts) {
+          try {
+            // Do a test fetch to verify SW is intercepting requests
+            const testUrl = '/push?_test=1';
+            const response = await fetch(testUrl, {
+              method: 'HEAD',
+              cache: 'no-store'
+            });
+
+            // If we get any response (even 405 Method Not Allowed), SW is active
+            console.log('[Bridge] Service worker verified active (status: ' + response.status + ')');
+            return;
+          } catch (error) {
+            attempt++;
+            if (attempt >= maxAttempts) {
+              console.warn('[Bridge] Service worker verification failed after ' + maxAttempts + ' attempts:', error);
+              return;
+            }
+            console.log('[Bridge] Service worker not yet active, retrying in ' + delay + 'ms... (attempt ' + attempt + ')');
+            await new Promise(resolve => setTimeout(resolve, delay));
+            delay = Math.min(delay * 2, 500); // Exponential backoff, max 500ms
+          }
         }
       }
 
       (async () => {
         // Register service worker before doing anything else
         await registerServiceWorker();
+
+        // Verify service worker is actively handling requests (critical for Safari)
+        await verifyServiceWorkerActive();
+
         const BRIDGE_ORIGIN = window.location.origin;
         const hostOrigins = new Set();
         const hostTargets = new Map();

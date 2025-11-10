@@ -40,32 +40,18 @@
     <script>
       // Register service worker first
       async function registerServiceWorker() {
-        if (!('serviceWorker' in navigator)) return;
-        try {
-          console.log('[Bridge] Registering service worker...');
-          const registration = await navigator.serviceWorker.register('/sw.js?v=' + Date.now(), { scope: '/' });
-          console.log('[Bridge] Service Worker registered:', registration.scope);
-
-          // Wait until an active worker exists
-          await navigator.serviceWorker.ready;
-          console.log('[Bridge] Service Worker is ready');
-
-          // Ensure this page is actually controlled before we use /push.
-          if (!navigator.serviceWorker.controller) {
-            console.log('[Bridge] SW active but not controlling this page - reloading to claim control');
-            // Avoid infinite loops by only reloading once per tab
-            const key = 'gleaned-bridge-sw-reloaded';
-            if (!sessionStorage.getItem(key)) {
-              sessionStorage.setItem(key, '1');
-              setTimeout(() => window.location.reload(), 300);
-              // Throw to halt further init until reload
-              throw new Error('Reloading to get SW control');
-            } else {
-              console.warn('[Bridge] SW still not controlling after reload');
-            }
+        if ('serviceWorker' in navigator) {
+          try {
+            console.log('[Bridge] Registering service worker...');
+            const registration = await navigator.serviceWorker.register('/sw.js?v=' + Date.now(), {
+              scope: '/'
+            });
+            console.log('[Bridge] Service Worker registered:', registration.scope);
+            await navigator.serviceWorker.ready;
+            console.log('[Bridge] Service Worker is ready');
+          } catch (error) {
+            console.warn('[Bridge] Service Worker registration failed:', error);
           }
-        } catch (error) {
-          console.warn('[Bridge] Service Worker registration failed:', error);
         }
       }
 

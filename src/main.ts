@@ -51,10 +51,54 @@ class MainApp {
   private showBookmarkletSection(): void {
     const bookmarkletSection = document.getElementById('bookmarklet-section')!
     const bookmarkletLink = document.getElementById('bookmarklet-link') as HTMLAnchorElement | null
+    const bookmarkletCodeTextarea = document.getElementById('bookmarklet-code') as HTMLTextAreaElement | null
+    const copyButton = document.getElementById('copy-button') as HTMLButtonElement | null
+    const copyFeedback = document.getElementById('copy-feedback') as HTMLSpanElement | null
 
     if (bookmarkletLink) {
       const href = this.buildBookmarkletHref(window.location.origin)
       bookmarkletLink.href = href
+
+      // Also populate the textarea for mobile users
+      if (bookmarkletCodeTextarea) {
+        bookmarkletCodeTextarea.value = href
+        bookmarkletCodeTextarea.rows = Math.max(3, Math.ceil(href.length / 80))
+      }
+
+      // Set up copy button
+      if (copyButton && bookmarkletCodeTextarea && copyFeedback) {
+        copyButton.addEventListener('click', async () => {
+          try {
+            // Try modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              await navigator.clipboard.writeText(href)
+              copyFeedback.textContent = '✅ Copied!'
+              copyFeedback.style.color = '#059669'
+            } else {
+              // Fallback: select and copy
+              bookmarkletCodeTextarea.select()
+              bookmarkletCodeTextarea.setSelectionRange(0, href.length)
+              const success = document.execCommand('copy')
+              if (success) {
+                copyFeedback.textContent = '✅ Copied!'
+                copyFeedback.style.color = '#059669'
+              } else {
+                throw new Error('Copy command failed')
+              }
+            }
+
+            // Clear feedback after 3 seconds
+            setTimeout(() => {
+              copyFeedback.textContent = ''
+            }, 3000)
+          } catch (error) {
+            console.error('Copy failed:', error)
+            copyFeedback.textContent = '❌ Copy failed - please select and copy manually'
+            copyFeedback.style.color = '#dc2626'
+          }
+        })
+      }
+
       if (import.meta.env.DEV) {
         console.log('[App] bookmarklet href preview:', href.slice(0, 120) + '…')
       }

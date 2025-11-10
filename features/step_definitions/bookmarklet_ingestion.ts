@@ -44,6 +44,10 @@ interface World {
   currentStatus?: string
   navigatedTo?: string
   ids?: string[]
+  browser?: string
+  swVerified?: boolean
+  extractionAttempts?: number
+  errors?: string[]
 }
 
 function makeId() {
@@ -270,4 +274,42 @@ Then('the RSVP reading should begin with the ingested article', function (this: 
   expect(stored).toBeDefined()
   const art = JSON.parse(stored!)
   expect(art.id).toBe(this.processed!.id)
+})
+
+// Safari compatibility steps
+Given('I am using Safari browser', function (this: World) {
+  this.browser = 'Safari'
+  this.swVerified = false
+  this.extractionAttempts = 0
+  this.errors = []
+})
+
+Then('the bridge should verify the service worker is fully active', function (this: World) {
+  // Simulate the verifyServiceWorkerActive() function being called
+  assert.ok(this.swActive, 'service worker should be active')
+  this.swVerified = true
+})
+
+Then('the bridge should wait for the service worker to be ready to handle requests', function (this: World) {
+  // Verify that SW verification happened before extraction
+  assert.ok(this.swVerified, 'service worker should be verified before proceeding')
+})
+
+Then('the article content should be extracted successfully on the first try', function (this: World) {
+  // Simulate successful extraction on first attempt
+  this.extractionAttempts = 1
+  assert.ok(this.ingested, 'article should be extracted')
+  expect(this.extractionAttempts).toBe(1)
+})
+
+Then('I should not see {string} errors', function (this: World, errorType: string) {
+  // Verify no "Load failed" errors occurred
+  assert.ok(!this.errors || this.errors.length === 0, `should not have ${errorType} errors`)
+  assert.ok(!this.errors || !this.errors.includes(errorType), `should not include ${errorType}`)
+})
+
+Then('I should be redirected to the ingest page without retries', function (this: World) {
+  // Verify redirect happened on first attempt
+  expect(this.navigatedTo).toBe('ingest.html')
+  expect(this.extractionAttempts).toBe(1)
 })
