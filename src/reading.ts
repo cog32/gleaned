@@ -176,6 +176,10 @@ class ReadingApp {
     // Update header
     this.articleTitleElement.textContent = this.article.title
 
+    // Apply current settings to reading service before processing text
+    const currentSettings = this.readingControls.getSettings()
+    this.readingService.updateSettings(currentSettings)
+
     // Process article text for RSVP
     const words = this.readingService.processText(this.article.cleanedContent, this.article.url)
     
