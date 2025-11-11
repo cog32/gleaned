@@ -31,24 +31,50 @@
 
         <!-- Bookmarklet Section -->
         <div id="bookmarklet-section" class="bookmarklet-section" style="display: none;">
-            <h2>📖 Read Any Article with Gleaned</h2>
-            <p>Drag this bookmarklet to your bookmarks bar, then click it on any article to start speed reading:</p>
+          <h2>📖 Read Any Article with Gleaned</h2>
+            <p>Add this bookmarklet to your browser, then click it on any article to start speed reading:</p>
 
             <div class="bookmarklet-container">
-                <a id="bookmarklet-link" href="javascript:void(0)"
-                    class="bookmarklet-link" onclick="return false;">
+                <a id="bookmarklet-link" href="javascript:void(0)" class="bookmarklet-link">
                     📖 Gleaned
                 </a>
+                <button id="copy-button-top" class="copy-button" style="display:none; margin-left: 0.5rem;">📋 Copy Code</button>
+                <span id="copy-feedback-top" class="copy-feedback"></span>
             </div>
 
-            <div class="bookmarklet-help">
-                <h3>How to use:</h3>
+            <!-- Platform-specific instructions -->
+            <div id="instructions-desktop" class="bookmarklet-instructions" style="display:none;">
+                <h3>How to use (Desktop)</h3>
                 <ol>
-                    <li>Drag the "📖 Gleaned" button above to your bookmarks bar</li>
-                    <li>Navigate to any article on the web</li>
-                    <li>Click the bookmarklet in your bookmarks bar</li>
-                    <li>The article will be extracted and opened in Gleaned</li>
+                    <li>Drag the "📖 Gleaned" button above to your bookmarks bar.</li>
+                    <li>When you’re on any article you want to speed read, click the bookmarklet.</li>
                 </ol>
+                <div style="margin-top: 1rem;">
+                    <img src="/demo.opt.gif" alt="How to use the Gleaned bookmarklet" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 6px;" />
+                </div>
+            </div>
+
+            <div id="instructions-ios" class="bookmarklet-instructions" style="display:none;">
+                <h3>How to use (iOS)</h3>
+                <p style="margin: 0.5rem 0 0.75rem; color: #555;">iOS doesn’t allow dragging a bookmarklet into the bookmarks bar. Use this workaround:</p>
+                <ol>
+                    <li>On this page, tap Share → <strong>Add Bookmark</strong> to add this page as a bookmark.</li>
+                    <li>Tap <strong>Copy Code</strong> above to copy the bookmarklet code.</li>
+                    <li>Edit the bookmark you just created and paste the copied code into the URL field. Need help? <a href="/iosdemo.opt.gif" target="_blank" rel="noopener noreferrer">Open the how‑to video</a>.</li>
+                </ol>
+                <div style="margin-top: 1rem;">
+                    <img src="/iosdemo.opt.gif" alt="How to set up the bookmarklet on iOS" style="max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 6px;" />
+                </div>
+            </div>
+
+            
+
+            <!-- Platform toggle links -->
+            <div id="platform-toggle" style="margin-top: 0.75rem; font-size: 0.95rem;">
+                <span>View instructions for: </span>
+                <a href="#" id="toggle-desktop">Desktop</a>
+                <span> | </span>
+                <a href="#" id="toggle-ios">iOS</a>
             </div>
         </div>
     </main>

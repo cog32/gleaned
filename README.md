@@ -8,15 +8,13 @@ If you find this project at all useful, consider a small donation for the time y
 
 ☕ *[Buy me a coffee](https://buymeacoffee.com/cog32)*
 
-## Installation
+## Installation and Usage
 
-Simply visit the page, [Gleaned](https://gleaned.pages.dev/) to try it out! No Apps, installs or signups.
-
-## Usage
+Simply visit the page, [Gleaned](https://gleaned.pages.dev/), save the bookmarklet, then click it when you want to read a page.
 
 Find an article to read, then click your bookmarklet.
 
-  #todo the video of the how to use.
+[Installation and Usage](./public/demo.opt.gif)
 
 ## Credits
 
