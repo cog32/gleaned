@@ -34,104 +34,74 @@
   <body>
     <main>
       <h1>Gleaned Bridge</h1>
-      <p>Keeping this tab open while we transfer the extractor…</p>
+      <p>Keep this tab open while we send your content…</p>
     </main>
 
     <script>
       // Register service worker first
       async function registerServiceWorker() {
-        if (!('serviceWorker' in navigator)) return;
-        try {
-          console.log('[Bridge] Registering service worker...');
-          const registration = await navigator.serviceWorker.register('/sw.js?v=' + Date.now(), { scope: '/' });
-          console.log('[Bridge] Service Worker registered:', registration.scope);
-
-          // Wait until an active worker exists
-          await navigator.serviceWorker.ready;
-          console.log('[Bridge] Service Worker is ready');
-
-          // Ensure this page is actually controlled before we use /push.
-          if (!navigator.serviceWorker.controller) {
-            console.log('[Bridge] SW active but not controlling this page - reloading to claim control');
-            // Avoid infinite loops by only reloading once per tab
-            const key = 'gleaned-bridge-sw-reloaded';
-            if (!sessionStorage.getItem(key)) {
-              sessionStorage.setItem(key, '1');
-              setTimeout(() => window.location.reload(), 300);
-              // Throw to halt further init until reload
-              throw new Error('Reloading to get SW control');
-            } else {
-              console.warn('[Bridge] SW still not controlling after reload');
-            }
+        if ('serviceWorker' in navigator) {
+          try {
+            console.log('[Bridge] Registering service worker...');
+            const registration = await navigator.serviceWorker.register('/sw.js?v=' + Date.now(), { scope: '/' });
+            console.log('[Bridge] Service Worker registered:', registration.scope);
+            await navigator.serviceWorker.ready;
+            console.log('[Bridge] Service Worker is ready');
+          } catch (error) {
+            console.warn('[Bridge] Service Worker registration failed:', error);
           }
-        } catch (error) {
-          console.warn('[Bridge] Service Worker registration failed:', error);
+        }
+      }
+
+      // Verify service worker is actively handling requests (Safari fix)
+      async function verifyServiceWorkerActive(maxAttempts = 10, initialDelay = 50) {
+        if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) {
+          console.log('[Bridge] No service worker controller, skipping verification');
+          return;
+        }
+        console.log('[Bridge] Verifying service worker is active...');
+        let attempt = 0;
+        let delay = initialDelay;
+        while (attempt < maxAttempts) {
+          try {
+            const testUrl = '/push?_test=1';
+            const response = await fetch(testUrl, { method: 'HEAD', cache: 'no-store' });
+            console.log('[Bridge] Service worker verified active (status: ' + response.status + ')');
+            return;
+          } catch (error) {
+            attempt++;
+            if (attempt >= maxAttempts) {
+              console.warn('[Bridge] Service worker verification failed after ' + maxAttempts + ' attempts:', error);
+              return;
+            }
+            console.log('[Bridge] Service worker not yet active, retrying in ' + delay + 'ms... (attempt ' + attempt + ')');
+            await new Promise(resolve => setTimeout(resolve, delay));
+            delay = Math.min(delay * 2, 500);
+          }
         }
       }
 
       (async () => {
-        // Register service worker before doing anything else
         await registerServiceWorker();
+        await verifyServiceWorkerActive();
+
         const BRIDGE_ORIGIN = window.location.origin;
         const hostOrigins = new Set();
         const hostTargets = new Map();
-        let extractorText = '';
-        let extractorReady = false;
         console.log('[Bridge] boot', { origin: BRIDGE_ORIGIN });
 
         function postToOpener(message, targetOrigin = '*') {
-          if (window.opener) {
-            window.opener.postMessage(message, targetOrigin);
-          }
-        }
-
-        function sendError(message) {
-          postToOpener({ type: 'ERROR', message }, '*');
-        }
-
-        async function loadExtractor() {
-          try {
-            const res = await fetch('/static/extractor.bundle.js', { cache: 'no-store' });
-            if (!res.ok) {
-              throw new Error('HTTP ' + res.status);
-            }
-            extractorText = await res.text();
-            extractorReady = true;
-            notifyHostsReady();
-            console.log('[Bridge] extractor loaded', { length: extractorText.length });
-          } catch (err) {
-            sendError('Fetch failed: ' + (err && err.message ? err.message : err));
-            throw err;
-          }
-        }
-
-        function sendChunks(targetWindow, targetOrigin, text, size = 120000) {
-          const total = Math.ceil(text.length / size);
-          for (let i = 0; i < total; i++) {
-            const piece = text.slice(i * size, (i + 1) * size);
-            targetWindow.postMessage({
-              type: 'CODE_CHUNK',
-              index: i,
-              total,
-              data: piece
-            }, targetOrigin);
-          }
+          if (window.opener) window.opener.postMessage(message, targetOrigin);
         }
 
         function allowOrigin(origin) {
-          if (!origin) {
-            return false;
-          }
-          if (hostOrigins.has(origin)) {
-            return true;
-          }
+          if (!origin) return false;
+          if (hostOrigins.has(origin)) return true;
           hostOrigins.add(origin);
           return true;
         }
 
-        function isAllowedOrigin(origin) {
-          return hostOrigins.has(origin);
-        }
+        function isAllowedOrigin(origin) { return hostOrigins.has(origin); }
 
         function rememberHost(origin, targetWindow) {
           if (!origin || !targetWindow) return;
@@ -141,188 +111,74 @@
 
         function notifyHostsReady() {
           for (const [origin, targetWindow] of hostTargets.entries()) {
-            try {
-              targetWindow?.postMessage({ type: 'READY', bridgeOrigin: BRIDGE_ORIGIN }, origin);
-              console.log('[Bridge] sent READY to remembered host', origin);
-            } catch (_) {
-              // ignore postMessage errors (window could be closed)
-            }
+            try { targetWindow?.postMessage({ type: 'READY', bridgeOrigin: BRIDGE_ORIGIN }, origin); } catch (_) {}
           }
           postToOpener({ type: 'READY', bridgeOrigin: BRIDGE_ORIGIN }, '*');
         }
 
-        function normalizeRedirect(path) {
-          if (!path) return '/ingest';
-          return path.startsWith('/') ? path : '/' + path;
-        }
+        function normalizeRedirect(path) { return !path ? '/ingest' : (path.startsWith('/') ? path : '/' + path); }
 
         async function handleBridgeCall(evt, data) {
-          const { id, action, payload } = data;
-          if (!id) return;
-
+          const { id, action, payload } = data; if (!id) return;
           if (action === 'push-content') {
             try {
-              const response = await fetch('/push', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload || {})
-              });
-
-              let result = null;
-              try {
-                result = await response.json();
-              } catch (_) {
-                result = null;
-              }
-
+              const response = await fetch('/push', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload || {}) });
+              let result = null; try { result = await response.json(); } catch (_) { result = null; }
               const success = response.ok && result ? !!result.success : response.ok;
               const redirectTo = result && result.redirectTo ? normalizeRedirect(result.redirectTo) : '/ingest';
-
-              const message = {
-                type: 'BRIDGE_RESPONSE',
-                id,
-                result: {
-                  success,
-                  redirectTo,
-                  status: response.status,
-                  error: result && result.error ? result.error : undefined
-                }
-              };
-
-              if (!success) {
-                message.error = result && result.error ? result.error : 'HTTP ' + response.status;
-              }
-
-              console.log('[Bridge] POST /push response', {
-                success,
-                status: response.status,
-                redirectTo
-              });
-
+              const message = { type: 'BRIDGE_RESPONSE', id, result: { success, redirectTo, status: response.status, error: result && result.error ? result.error : undefined } };
+              if (!success) message.error = result && result.error ? result.error : 'HTTP ' + response.status;
               const targetOrigin = evt.origin || '*';
-              try {
-                evt.source?.postMessage(message, targetOrigin);
-              } catch (err) {
-                console.warn('[Bridge] postMessage to source failed', err);
-              }
-              try {
-                postToOpener(message, targetOrigin);
-              } catch (err) {
-                console.warn('[Bridge] postMessage to opener failed', err);
-              }
+              try { evt.source?.postMessage(message, targetOrigin); } catch (err) { console.warn('[Bridge] postMessage to source failed', err); }
+              try { postToOpener(message, targetOrigin); } catch (err) { console.warn('[Bridge] postMessage to opener failed', err); }
               if (success) {
-                const redirectMessage = {
-                  type: 'BRIDGE_REDIRECT',
-                  redirectTo
-                };
-                try {
-                  evt.source?.postMessage(redirectMessage, targetOrigin);
-                } catch (_) {
-                  // ignore
-                }
-                try {
-                  postToOpener(redirectMessage, targetOrigin);
-                } catch (_) {
-                  // ignore
-                }
+                const redirectMessage = { type: 'BRIDGE_REDIRECT', redirectTo };
+                try { evt.source?.postMessage(redirectMessage, targetOrigin); } catch (_) {}
+                try { postToOpener(redirectMessage, targetOrigin); } catch (_) {}
               }
             } catch (err) {
               console.error('[Bridge] BRIDGE_CALL error', err);
               const targetOrigin = evt.origin || '*';
-              const errorMessage = {
-                type: 'BRIDGE_RESPONSE',
-                id,
-                error: err && err.message ? err.message : String(err)
-              };
-              try {
-                evt.source?.postMessage(errorMessage, targetOrigin);
-              } catch (_) {
-                // ignore
-              }
-              try {
-                postToOpener(errorMessage, targetOrigin);
-              } catch (_) {
-                // ignore
-              }
+              const errorMessage = { type: 'BRIDGE_RESPONSE', id, error: err && err.message ? err.message : String(err) };
+              try { evt.source?.postMessage(errorMessage, targetOrigin); } catch (_) {}
+              try { postToOpener(errorMessage, targetOrigin); } catch (_) {}
             }
           }
         }
 
-        await loadExtractor();
-        postToOpener({ type: 'READY', bridgeOrigin: BRIDGE_ORIGIN }, '*');
+        notifyHostsReady();
 
         window.addEventListener('message', (evt) => {
           const data = evt.data || {};
-
           if (data.type === 'REGISTER_HOST') {
             console.log('[Bridge] REGISTER_HOST from', evt.origin, data);
             const allowed = allowOrigin(evt.origin);
             if (!allowed) {
-              evt.source?.postMessage({
-                type: 'ERROR',
-                message: 'Origin not permitted'
-              }, evt.origin);
+              evt.source?.postMessage({ type: 'ERROR', message: 'Origin not permitted' }, evt.origin);
             } else {
               rememberHost(evt.origin, evt.source);
-              if (extractorReady) {
-                try {
-                  evt.source?.postMessage({
-                    type: 'READY',
-                    bridgeOrigin: BRIDGE_ORIGIN
-                  }, evt.origin);
-                  console.log('[Bridge] READY (late) ->', evt.origin);
-                } catch (_) {
-                  // ignore
-                }
-              }
+              try { evt.source?.postMessage({ type: 'READY', bridgeOrigin: BRIDGE_ORIGIN }, evt.origin); } catch (_) {}
             }
             return;
           }
-
           if (!isAllowedOrigin(evt.origin)) {
             if (!allowOrigin(evt.origin)) {
-              if (data.type === 'SEND_EXTRACTOR' || data.type === 'BRIDGE_CALL') {
-                evt.source?.postMessage({
-                  type: 'ERROR',
-                  message: 'Unauthorized bridge request'
-                }, evt.origin);
+              if (data.type === 'BRIDGE_CALL') {
+                evt.source?.postMessage({ type: 'ERROR', message: 'Unauthorized bridge request' }, evt.origin);
               }
               console.warn('[Bridge] rejected message from unregistered origin', evt.origin, data);
               return;
             } else {
               rememberHost(evt.origin, evt.source);
-              if (extractorReady) {
-                try {
-                  evt.source?.postMessage({
-                    type: 'READY',
-                    bridgeOrigin: BRIDGE_ORIGIN
-                  }, evt.origin);
-                  console.log('[Bridge] READY (auto) ->', evt.origin);
-                } catch (_) {
-                  // ignore
-                }
-              }
+              try { evt.source?.postMessage({ type: 'READY', bridgeOrigin: BRIDGE_ORIGIN }, evt.origin); } catch (_) {}
             }
           }
-
-          if (data.type === 'SEND_EXTRACTOR') {
-            console.log('[Bridge] SEND_EXTRACTOR for', evt.origin, { length: extractorText.length });
-            sendChunks(evt.source, evt.origin, extractorText);
-            return;
-          }
-
           if (data.type === 'BRIDGE_CALL') {
             console.log('[Bridge] BRIDGE_CALL', evt.origin, data.action);
             handleBridgeCall(evt, data);
             return;
           }
-
-          // Always inform the opener if we did not handle a message.
-          evt.source?.postMessage({
-            type: 'BRIDGE_RESPONSE',
-            id: data.id,
-            error: 'Unhandled message type'
-          }, evt.origin);
+          evt.source?.postMessage({ type: 'BRIDGE_RESPONSE', id: data.id, error: 'Unhandled message type' }, evt.origin);
         });
       })();
     </script>
