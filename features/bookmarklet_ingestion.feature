@@ -38,9 +38,19 @@ Feature: Bookmarklet Article Ingestion
     And I should navigate to the reading page
     And the RSVP reading should begin with the ingested article
 
-  Scenario: View full article from ingest page  
+  Scenario: View full article from ingest page
     Given I have successfully processed an article via bookmarklet
     When I click "View Article"
     Then the article should be stored with a unique identifier
     And I should navigate to the main page in view mode
     And I should see the full cleaned article content
+
+  Scenario: Safari browser compatibility with service worker
+    Given I am using Safari browser
+    And I am reading an article on "https://techcrunch.com/article"
+    When I click the Gleaned bookmarklet
+    Then the bridge should verify the service worker is fully active
+    And the bridge should wait for the service worker to be ready to handle requests
+    And the article content should be extracted successfully on the first try
+    And I should not see "Load failed" errors
+    And I should be redirected to the ingest page without retries

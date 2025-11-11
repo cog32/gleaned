@@ -21,7 +21,7 @@ describe('Page Content Verification', () => {
       const indexPath = join(distPath, 'index.html')
       const content = readFileSync(indexPath, 'utf-8')
       expect(content).not.toContain('Gleaned Bridge')
-      expect(content).not.toContain('Keeping this tab open while we transfer the extractor')
+      expect(content).not.toContain('Keep this tab open while we send your content')
     })
 
     it('should have the bookmarklet section', () => {
@@ -118,7 +118,7 @@ describe('Page Content Verification', () => {
       const bridgePath = join(distPath, 'bridge', 'index.html')
       const content = readFileSync(bridgePath, 'utf-8')
       expect(content).toContain('Gleaned Bridge')
-      expect(content).toContain('Keeping this tab open while we transfer the extractor')
+      expect(content).toContain('Keep this tab open while we send your content')
     })
 
     it('should have service worker registration script', () => {
@@ -148,7 +148,7 @@ describe('Page Content Verification', () => {
       const bridgeContent = readFileSync(bridgePath, 'utf-8')
 
       // Main page should not have bridge text
-      expect(indexContent).not.toContain('Keeping this tab open while we transfer the extractor')
+      expect(indexContent).not.toContain('Keep this tab open while we send your content')
 
       // Bridge page should not have main page content
       expect(bridgeContent).not.toContain('bookmarklet-section')

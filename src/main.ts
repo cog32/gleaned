@@ -51,13 +51,99 @@ class MainApp {
   private showBookmarkletSection(): void {
     const bookmarkletSection = document.getElementById('bookmarklet-section')!
     const bookmarkletLink = document.getElementById('bookmarklet-link') as HTMLAnchorElement | null
+    const copyButtonTop = document.getElementById('copy-button-top') as HTMLButtonElement | null
+    const copyFeedbackTop = document.getElementById('copy-feedback-top') as HTMLSpanElement | null
+    const desktopInstructions = document.getElementById('instructions-desktop') as HTMLElement | null
+    const iosInstructions = document.getElementById('instructions-ios') as HTMLElement | null
+    const toggleDesktop = document.getElementById('toggle-desktop') as HTMLAnchorElement | null
+    const toggleIOS = document.getElementById('toggle-ios') as HTMLAnchorElement | null
 
-    if (bookmarkletLink) {
-      const href = this.buildBookmarkletHref(window.location.origin)
-      bookmarkletLink.href = href
+      if (bookmarkletLink) {
+        const href = this.buildBookmarkletHref(window.location.origin)
+        bookmarkletLink.href = href
+
+      // Set up top copy button (for iOS)
+      if (copyButtonTop && copyFeedbackTop) {
+        copyButtonTop.addEventListener('click', async () => {
+          try {
+            // Try modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              await navigator.clipboard.writeText(href)
+              copyFeedbackTop.textContent = '✅ Copied!'
+              copyFeedbackTop.style.color = '#059669'
+            } else {
+              // Fallback: create a temporary hidden textarea to copy
+              const ta = document.createElement('textarea')
+              ta.value = href
+              ta.setAttribute('readonly', '')
+              ta.style.position = 'absolute'
+              ta.style.left = '-9999px'
+              document.body.appendChild(ta)
+              ta.select()
+              ta.setSelectionRange(0, href.length)
+              const success = document.execCommand('copy')
+              document.body.removeChild(ta)
+              if (!success) throw new Error('Copy command failed')
+              copyFeedbackTop.textContent = '✅ Copied!'
+              copyFeedbackTop.style.color = '#059669'
+            }
+
+            // Clear feedback after 3 seconds
+            setTimeout(() => {
+              copyFeedbackTop.textContent = ''
+            }, 3000)
+          } catch (error) {
+            console.error('Copy failed:', error)
+            copyFeedbackTop.textContent = '❌ Copy failed - please select and copy manually'
+            copyFeedbackTop.style.color = '#dc2626'
+          }
+        })
+      }
+
       if (import.meta.env.DEV) {
         console.log('[App] bookmarklet href preview:', href.slice(0, 120) + '…')
       }
+      }
+
+    // Platform detection and instruction toggle
+    const isIOS = (() => {
+      const ua = navigator.userAgent || ''
+      const iOSUA = /iPad|iPhone|iPod/.test(ua)
+      const iPadOS = navigator.platform === 'MacIntel' && (navigator as any).maxTouchPoints > 1
+      return iOSUA || iPadOS
+    })()
+
+    const showDesktop = () => {
+      desktopInstructions && (desktopInstructions.style.display = 'block')
+      iosInstructions && (iosInstructions.style.display = 'none')
+      if (bookmarkletLink) bookmarkletLink.style.display = 'inline-block'
+      if (copyButtonTop) copyButtonTop.style.display = 'none'
+      if (copyFeedbackTop) copyFeedbackTop.textContent = ''
+      toggleDesktop && (toggleDesktop.style.fontWeight = 'bold')
+      toggleIOS && (toggleIOS.style.fontWeight = 'normal')
+    }
+    const showIOS = () => {
+      desktopInstructions && (desktopInstructions.style.display = 'none')
+      iosInstructions && (iosInstructions.style.display = 'block')
+      if (bookmarkletLink) bookmarkletLink.style.display = 'none'
+      if (copyButtonTop) copyButtonTop.style.display = 'inline-block'
+      toggleDesktop && (toggleDesktop.style.fontWeight = 'normal')
+      toggleIOS && (toggleIOS.style.fontWeight = 'bold')
+    }
+
+    // Default based on detection
+    if (isIOS) {
+      showIOS()
+    } else {
+      showDesktop()
+    }
+
+    // Swap handlers
+    if (toggleDesktop) {
+      toggleDesktop.addEventListener('click', (e) => { e.preventDefault(); showDesktop() })
+    }
+    if (toggleIOS) {
+      toggleIOS.addEventListener('click', (e) => { e.preventDefault(); showIOS() })
     }
 
     bookmarkletSection.style.display = 'block'
@@ -76,21 +162,18 @@ class MainApp {
       "  const W=window.open(B,'_blank');\n",
       "  if(!W){alert('Popup blocked');return;}\n",
       "  const pending=new Map();\n",
-      "  const chunkMap=new Map();\n",
-      "  let seq=0;let total=null;let extractorRequested=false;let extractorLoaded=false;\n",
+      "  let seq=0;\n",
       "  const registerMsg={type:'REGISTER_HOST',origin:window.location.origin};\n",
       "  function sendRegister(){if(!W||W.closed){window.clearInterval(registerTimer);return;}try{W.postMessage(registerMsg,O);console.log('[Bookmarklet] REGISTER_HOST ->',O);}catch(err){console.warn('[Bookmarklet] register failed',err);}}\n",
       "  const registerTimer=window.setInterval(sendRegister,500);\n",
       "  sendRegister();\n",
       "  function stopRegister(){window.clearInterval(registerTimer);}\n",
-      "  function requestExtractor(){if(extractorRequested||extractorLoaded)return;extractorRequested=true;console.log('[Bookmarklet] requesting extractor');try{W.postMessage({type:'SEND_EXTRACTOR',want:'extractor@v1'},O);}catch(err){console.warn('[Bookmarklet] SEND_EXTRACTOR failed',err);}}\n",
-      "  function inject(text){const blob=new Blob([text],{type:'text/javascript'});const url=URL.createObjectURL(blob);const s=document.createElement('script');s.src=url;s.onload=()=>{URL.revokeObjectURL(url);};document.documentElement.appendChild(s);}\n",
       "  function showOverlay(msg){try{var el=document.getElementById('gleaned-overlay');if(!el){el=document.createElement('div');el.id='gleaned-overlay';el.style.cssText='position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);color:#fff;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;z-index:2147483647;text-align:center;padding:24px;';document.documentElement.appendChild(el);}el.textContent=msg;}catch(_){}}\n",
       "  function hideOverlay(){try{var el=document.getElementById('gleaned-overlay');if(el)el.remove();}catch(_){}}\n",
       "  async function minimalExtractAndSend(){showOverlay('Sending to Gleaned…');try{var payload={html:document.documentElement.outerHTML,url:window.location.href,title:document.title||'',author:'',timestamp:Date.now()};var r=await window.__GLEAMED_BRIDGE__.call('push-content',payload);if(r&&r.success){if(typeof window.__GLEAMED_BRIDGE__.navigate==='function'){window.__GLEAMED_BRIDGE__.navigate('/ingest');}else{window.open(O+'/ingest','_blank');}hideOverlay();return;}throw new Error((r&&r.error)||'Bridge push failed');}catch(err){try{var res=await fetch(O+'/push',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({html:document.documentElement.outerHTML,url:window.location.href,title:document.title||'',author:'',timestamp:Date.now()})});if(res&&res.ok){window.open(O+'/ingest','_blank');hideOverlay();return;}}catch(_){ }hideOverlay();alert('Gleaned: Unable to send content. Please try copying the URL into the app.');}}\n",
       "  function resolveBridge(id,error,result){const entry=pending.get(id);if(!entry)return;pending.delete(id);clearTimeout(entry.timer);if(error){const err=error instanceof Error?error:new Error(typeof error==='string'?error:'Bridge error');console.error('[Bookmarklet] bridge error',err);entry.reject(err);}else{console.log('[Bookmarklet] bridge response',id,result);entry.resolve(result);}}\n",
-      "  function setupBridge(){console.log('[Bookmarklet] bridge ready');extractorLoaded=true;window.__GLEAMED_PWA_ORIGIN=O;window.__GLEAMED_BRIDGE__={call(action,payload){const id='g'+Date.now()+'-'+seq++;console.log('[Bookmarklet] bridge call',action);try{W.postMessage({type:'BRIDGE_CALL',id,action,payload},O);}catch(err){console.error('[Bookmarklet] BRIDGE_CALL postMessage failed',err);throw err;}return new Promise((resolve,reject)=>{const timer=window.setTimeout(()=>{if(pending.has(id)){pending.delete(id);reject(new Error('Bridge timed out'));}},15000);pending.set(id,{resolve,reject,timer});});},navigate(path){const suffix=(path&&path.charAt(0)==='/')?path:'/'+(path||'');const target=O+suffix;try{W.location.href=target;}catch(_){window.open(target,'_blank');}},dispose(){pending.clear();delete window.__GLEAMED_BRIDGE__;delete window.__GLEAMED_PWA_ORIGIN;window.removeEventListener('message',onMessage);stopRegister();}};}\n",
-      "  function onMessage(event){if(event.origin!==O)return;const data=event.data||{};console.log('[Bookmarklet] message',data.type,data);if(data.type==='READY'){stopRegister();setupBridge();minimalExtractAndSend();}else if(data.type==='CODE_CHUNK'){if(extractorLoaded)return;if(total===null)total=data.total;if(!chunkMap.has(data.index)){chunkMap.set(data.index,data.data);}console.log('[Bookmarklet] chunk',chunkMap.size,'of',total);if(chunkMap.size>=total){stopRegister();setupBridge();const ordered=[...chunkMap.keys()].sort((a,b)=>a-b).map((key)=>chunkMap.get(key)).join('');inject(ordered);}}else if(data.type==='ERROR'){stopRegister();alert('Bridge error: '+data.message);}else if(data.type==='BRIDGE_RESPONSE'){resolveBridge(data.id,data.error,data.result);}}\n",
+      "  function setupBridge(){console.log('[Bookmarklet] bridge ready');window.__GLEAMED_PWA_ORIGIN=O;window.__GLEAMED_BRIDGE__={call(action,payload){const id='g'+Date.now()+'-'+seq++;console.log('[Bookmarklet] bridge call',action);try{W.postMessage({type:'BRIDGE_CALL',id,action,payload},O);}catch(err){console.error('[Bookmarklet] BRIDGE_CALL postMessage failed',err);throw err;}return new Promise((resolve,reject)=>{const timer=window.setTimeout(()=>{if(pending.has(id)){pending.delete(id);reject(new Error('Bridge timed out'));}},15000);pending.set(id,{resolve,reject,timer});});},navigate(path){const suffix=(path&&path.charAt(0)==='/')?path:'/'+(path||'');const target=O+suffix;try{W.location.href=target;}catch(_){window.open(target,'_blank');}},dispose(){pending.clear();delete window.__GLEAMED_BRIDGE__;delete window.__GLEAMED_PWA_ORIGIN;window.removeEventListener('message',onMessage);stopRegister();}};}\n",
+      "  function onMessage(event){if(event.origin!==O)return;const data=event.data||{};console.log('[Bookmarklet] message',data.type,data);if(data.type==='READY'){stopRegister();setupBridge();minimalExtractAndSend();}else if(data.type==='ERROR'){stopRegister();alert('Bridge error: '+data.message);}else if(data.type==='BRIDGE_RESPONSE'){resolveBridge(data.id,data.error,data.result);}}\n",
       "  window.addEventListener('message',onMessage);\n",
       "})();\n"
     ];

@@ -7,7 +7,6 @@ const IS_DEV = self.location.hostname === 'localhost' || self.location.hostname 
 const STATIC_FILES = [
   '/manifest.json',
   '/favicon.ico',
-  '/static/extractor.bundle.js',
   '/vendor/Readability.js'
 ]
 

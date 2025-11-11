@@ -276,7 +276,10 @@ body {
   font-size: 1.1rem;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
   transition: all 0.2s;
-  cursor: grab;
+  cursor: pointer;
+  /* iOS Safari compatibility - ensure touch callout works */
+  -webkit-touch-callout: default;
+  user-select: text;
 }
 
 .bookmarklet-link:hover {
@@ -286,7 +289,97 @@ body {
 }
 
 .bookmarklet-link:active {
-  cursor: grabbing;
+  background: #1d4ed8;
+}
+
+.bookmarklet-instructions {
+  max-width: 600px;
+  margin: 1.5rem auto;
+  padding: 1rem 1.5rem;
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  border-radius: 4px;
+  text-align: left;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.bookmarklet-instructions p {
+  margin: 0;
+  color: #78350f;
+}
+
+.mobile-copy-section {
+  max-width: 600px;
+  margin: 1.5rem auto;
+  padding: 1.5rem;
+  background: #f0f9ff;
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.mobile-copy-section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1e40af;
+  font-size: 0.9rem;
+}
+
+.bookmarklet-code-text {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #93c5fd;
+  border-radius: 6px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  background: white;
+  color: #1e293b;
+  resize: vertical;
+  overflow-wrap: break-word;
+  word-break: break-all;
+  -webkit-user-select: all;
+  user-select: all;
+}
+
+.bookmarklet-code-text:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.copy-button {
+  display: block;
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.copy-button:hover {
+  background: #2563eb;
+}
+
+.copy-button:active {
+  background: #1d4ed8;
+}
+
+.copy-feedback {
+  display: block;
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #059669;
+  min-height: 1.5rem;
 }
 
 .bookmarklet-help {
