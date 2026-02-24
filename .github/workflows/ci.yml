@@ -16,6 +16,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
+      - run: npm run build
       - name: Install Vitest coverage provider (no-save)
         run: npm i -D @vitest/coverage-v8 --no-save
       - name: Unit tests (Vitest)

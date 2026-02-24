@@ -26,6 +26,29 @@ describe('Ingest Page Fix', () => {
     })
   })
 
+  it('should not have overflow hidden on the body in ingest page styles', () => {
+    // The ingest page inline styles must NOT set overflow: hidden on body,
+    // otherwise iPhone users cannot scroll and buttons get covered by the footer.
+    const fs = require('fs')
+    const path = require('path')
+    const html = fs.readFileSync(path.resolve(__dirname, '../../ingest.html'), 'utf-8')
+
+    // Extract inline <style> content
+    const styleMatch = html.match(/<style>([\s\S]*?)<\/style>/)
+    expect(styleMatch).not.toBeNull()
+    const styleContent = styleMatch![1]
+
+    // Extract the body rule
+    const bodyRuleMatch = styleContent.match(/body\s*\{([^}]*)\}/)
+    expect(bodyRuleMatch).not.toBeNull()
+    const bodyRule = bodyRuleMatch![1]
+
+    // Body must not have overflow: hidden
+    expect(bodyRule).not.toMatch(/overflow\s*:\s*hidden/)
+    // Body must not have max-height: 100vh (prevents scrolling)
+    expect(bodyRule).not.toMatch(/max-height\s*:\s*100vh/)
+  })
+
   it('should store articles from ingest page with unique keys', () => {
     // Mock processed articles from ingest page
     const article1 = {
